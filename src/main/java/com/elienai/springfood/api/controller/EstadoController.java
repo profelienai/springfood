@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,8 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.elienai.springfood.domain.exception.EntidadeEmUsoException;
+import com.elienai.springfood.domain.exception.EntidadeNaoEncontradaException;
 import com.elienai.springfood.domain.model.Estado;
 import com.elienai.springfood.domain.repository.EstadoRepository;
+import com.elienai.springfood.domain.service.CadastroEstadoService;
 
 @RestController
 @RequestMapping("/estados")
@@ -27,6 +28,9 @@ public class EstadoController {
 
 	@Autowired
 	private EstadoRepository estadoRepository;
+	
+	@Autowired
+	private CadastroEstadoService cadastroEstado;
 	
 	@GetMapping
 	public List<Estado> listar() {
@@ -47,7 +51,7 @@ public class EstadoController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Estado adicionar(@RequestBody Estado estado) {
-		return estadoRepository.salvar(estado);
+		return cadastroEstado.salvar(estado);
 	}
 	
 	@PutMapping("/{estadoId}")
@@ -58,7 +62,7 @@ public class EstadoController {
 		if (estadoAtual != null) {
 			BeanUtils.copyProperties(estado, estadoAtual, "id");
 			
-			estadoAtual = estadoRepository.salvar(estadoAtual);
+			estadoAtual = cadastroEstado.salvar(estadoAtual);
 			return ResponseEntity.ok(estadoAtual);
 		}
 		
@@ -68,13 +72,14 @@ public class EstadoController {
 	@DeleteMapping("/{estadoId}")
 	public ResponseEntity<?> remover(@PathVariable Long estadoId) {
 		try {
-			estadoRepository.remover(estadoId);	
+			cadastroEstado.excluir(estadoId);	
 			return ResponseEntity.noContent().build();
 			
-		} catch (EmptyResultDataAccessException e) {
-			return ResponseEntity.notFound().build();
+		} catch (EntidadeNaoEncontradaException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(e.getMessage());
 			
-		} catch (DataIntegrityViolationException e) {
+		} catch (EntidadeEmUsoException e) {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
 					.body(e.getMessage());
 		}
