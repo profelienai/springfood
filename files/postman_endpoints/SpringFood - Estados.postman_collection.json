@@ -1,0 +1,27 @@
+{
+	"info": {
+		"_postman_id": "2207d5b5-e432-47aa-ad4e-4219e546f7ea",
+		"name": "SpringFood - Estados",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "8949159"
+	},
+	"item": [
+		{
+			"name": "Estados",
+			"item": []
+		},
+		{
+			"name": "Cidades",
+			"item": [
+				{
+					"name": "Cozinhas",
+					"item": []
+				}
+			]
+		},
+		{
+			"name": "Restaurantes",
+			"item": []
+		}
+	]
+}
