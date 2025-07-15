@@ -3,4 +3,4 @@ create table estado (
 	nome varchar(80) not null,
 	
 	primary key (id)
-) engine=InnoDB default charset=utf8;
+) engine=InnoDB default charset=utf8mb4;
