@@ -25,6 +25,15 @@
 			"response": []
 		},
 		{
+			"name": "Buscar NotFound",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "localhost:8080/cozinhas/100"
+			},
+			"response": []
+		},
+		{
 			"name": "Adicionar",
 			"request": {
 				"method": "POST",
@@ -61,11 +70,47 @@
 			"response": []
 		},
 		{
+			"name": "Atualizar NotFound",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"Chinesa\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "localhost:8080/cozinhas/100"
+			},
+			"response": []
+		},
+		{
 			"name": "Remover",
 			"request": {
 				"method": "DELETE",
 				"header": [],
 				"url": "localhost:8080/cozinhas/3"
+			},
+			"response": []
+		},
+		{
+			"name": "Remover NotFound",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "localhost:8080/cozinhas/300"
+			},
+			"response": []
+		},
+		{
+			"name": "Remover Conflict",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "localhost:8080/cozinhas/1"
 			},
 			"response": []
 		}

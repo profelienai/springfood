@@ -63,7 +63,6 @@
     </dependency>
 
     <!-- Flyway -->
-
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
@@ -73,7 +72,47 @@
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-mysql</artifactId>
     </dependency>
+
+	<!-- Dependência para testes com JUnit 5 -->
+	<dependency>
+		<groupId>org.junit.jupiter</groupId>
+		<artifactId>junit-jupiter</artifactId>
+		<scope>test</scope>
+	</dependency>
+
+	<!-- Mockito para mocks -->
+	<dependency>
+		<groupId>org.mockito</groupId>
+		<artifactId>mockito-core</artifactId>
+		<scope>test</scope>
+	</dependency>
+
+	<!-- Mockito + JUnit 5 integration -->
+	<dependency>
+		<groupId>org.mockito</groupId>
+		<artifactId>mockito-junit-jupiter</artifactId>
+		<scope>test</scope>
+	</dependency>
+
+	<!-- Spring Boot test support -->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-test</artifactId>
+		<scope>test</scope>
+		<exclusions>
+			<exclusion>
+				<groupId>org.junit.vintage</groupId>
+				<artifactId>junit-vintage-engine</artifactId>
+			</exclusion>
+		</exclusions>
+	</dependency>    
     
+    <!-- JUnit Platform Launcher -->    
+	<dependency>
+	     <groupId>org.junit.platform</groupId>
+	     <artifactId>junit-platform-launcher</artifactId>
+	     <scope>test</scope>
+	</dependency>
   </dependencies>
 
   <build>

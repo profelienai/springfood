@@ -25,6 +25,15 @@
 			"response": []
 		},
 		{
+			"name": "Buscar NotFound",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "localhost:8080/cidades/30"
+			},
+			"response": []
+		},
+		{
 			"name": "Adicionar",
 			"request": {
 				"method": "POST",
@@ -32,6 +41,24 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n    \"nome\": \"Taubaté\",\r\n    \"estado\": {\r\n        \"id\": 2\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "localhost:8080/cidades"
+			},
+			"response": []
+		},
+		{
+			"name": "Adicionar BadRequest",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"Taubaté\",\r\n    \"estado\": {\r\n        \"id\": 20\r\n    }\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -61,11 +88,56 @@
 			"response": []
 		},
 		{
+			"name": "Atualizar BadRequest",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"Taubaté\",\r\n    \"estado\": {\r\n        \"id\": 20\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "localhost:8080/cidades/1"
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar NotFound",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"Taubaté\",\r\n    \"estado\": {\r\n        \"id\": 20\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "localhost:8080/cidades/100"
+			},
+			"response": []
+		},
+		{
 			"name": "Remover",
 			"request": {
 				"method": "DELETE",
 				"header": [],
-				"url": "localhost:8080/cidades/4"
+				"url": "localhost:8080/cidades/5"
+			},
+			"response": []
+		},
+		{
+			"name": "Remover NotFound",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "localhost:8080/cidades/100"
 			},
 			"response": []
 		}

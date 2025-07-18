@@ -7,21 +7,112 @@
 	},
 	"item": [
 		{
-			"name": "Estados",
-			"item": []
+			"name": "Listar",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "localhost:8080/estados"
+			},
+			"response": []
 		},
 		{
-			"name": "Cidades",
-			"item": [
-				{
-					"name": "Cozinhas",
-					"item": []
-				}
-			]
+			"name": "Buscar",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "localhost:8080/estados/3"
+			},
+			"response": []
 		},
 		{
-			"name": "Restaurantes",
-			"item": []
+			"name": "Buscar NotFound",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "localhost:8080/estados/300"
+			},
+			"response": []
+		},
+		{
+			"name": "Adicionar",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"Rio de Janeiro\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "localhost:8080/estados"
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"Bahia\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "localhost:8080/estados/1"
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar NotFound",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"Bahia\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "localhost:8080/estados/100"
+			},
+			"response": []
+		},
+		{
+			"name": "Remover",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "localhost:8080/estados/4"
+			},
+			"response": []
+		},
+		{
+			"name": "Remover NotFound",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "localhost:8080/estados/400"
+			},
+			"response": []
+		},
+		{
+			"name": "Remover Conflict",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "localhost:8080/estados/1"
+			},
+			"response": []
 		}
 	]
 }
