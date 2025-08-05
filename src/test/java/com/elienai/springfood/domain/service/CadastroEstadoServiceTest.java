@@ -10,6 +10,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -91,4 +93,31 @@ public class CadastroEstadoServiceTest {
 		assertEquals("Estado de código 10 não pode ser removido, pois está em uso", ex.getMessage());
 		verify(estadoRepository).deleteById(estadoId);		
 	}
+	
+	@Test
+	void testBuscarOuFalhar_ComSucesso() {
+		Long estadoId = 10L;
+		
+		when(estadoRepository.findById(estadoId)).thenReturn(Optional.of(estado));
+		
+		Estado estadoEncontrado = cadastroEstadoService.buscarOuFalhar(estadoId);
+	
+		assertNotNull(estadoEncontrado);
+		assertSame(estado, estadoEncontrado);
+		
+		verify(estadoRepository).findById(estadoId);
+	}
+	
+	@Test
+	void testBuscarOuFalhar_LancarExcecaoQuandoEstadoNaoExiste() {
+		Long estadoId = 999L;
+		
+		when(estadoRepository.findById(estadoId)).thenReturn(Optional.empty());
+		
+		EntidadeNaoEncontradaException ex =
+				assertThrows(EntidadeNaoEncontradaException.class, () -> cadastroEstadoService.buscarOuFalhar(estadoId));
+		
+		assertEquals("Não existe um cadastro de estado com código 999", ex.getMessage());
+		verify(estadoRepository).findById(estadoId);
+	}	
 }

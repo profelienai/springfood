@@ -9,7 +9,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -26,10 +25,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 
 import com.elienai.springfood.domain.exception.EntidadeEmUsoException;
 import com.elienai.springfood.domain.exception.EntidadeNaoEncontradaException;
-import com.elienai.springfood.domain.model.Restaurante;
 import com.elienai.springfood.domain.model.Cozinha;
-import com.elienai.springfood.domain.repository.RestauranteRepository;
+import com.elienai.springfood.domain.model.Restaurante;
 import com.elienai.springfood.domain.repository.CozinhaRepository;
+import com.elienai.springfood.domain.repository.RestauranteRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class CadastroRestauranteServiceTest {
@@ -118,4 +117,31 @@ public class CadastroRestauranteServiceTest {
 		assertEquals("Restaurante de código 10 não pode ser removido, pois está em uso", ex.getMessage());
 		verify(restauranteRepository).deleteById(restauranteId);		
 	}
+	
+	@Test
+	void testBuscarOuFalhar_ComSucesso() {
+		Long restauranteId = 10L;
+		
+		when(restauranteRepository.findById(restauranteId)).thenReturn(Optional.of(restaurante));
+		
+		Restaurante restauranteEncontrado = cadastroRestauranteService.buscarOuFalhar(restauranteId);
+	
+		assertNotNull(restauranteEncontrado);
+		assertSame(restaurante, restauranteEncontrado);
+		
+		verify(restauranteRepository).findById(restauranteId);
+	}
+	
+	@Test
+	void testBuscarOuFalhar_LancarExcecaoQuandoRestauranteNaoExiste() {
+		Long restauranteId = 999L;
+		
+		when(restauranteRepository.findById(restauranteId)).thenReturn(Optional.empty());
+		
+		EntidadeNaoEncontradaException ex =
+				assertThrows(EntidadeNaoEncontradaException.class, () -> cadastroRestauranteService.buscarOuFalhar(restauranteId));
+		
+		assertEquals("Não existe um cadastro de restaurante com código 999", ex.getMessage());
+		verify(restauranteRepository).findById(restauranteId);
+	}	
 }

@@ -9,7 +9,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -67,8 +66,8 @@ public class CadastroCidadeServiceTest {
 		assertNotNull(cidadeSalva);
 		assertSame(cidade, cidadeSalva);
 		
-		verify(estadoRepository, times(1)).findById(1L);
-		verify(cidadeRepository, times(1)).save(cidade);
+		verify(estadoRepository).findById(1L);
+		verify(cidadeRepository).save(cidade);
 	}
 	
 	@Test
@@ -94,7 +93,7 @@ public class CadastroCidadeServiceTest {
 	}
 	
 	@Test
-	void testExluir_LancarExcecaoQuandoCidadeNaoExiste() {
+	void testExcluir_LancarExcecaoQuandoCidadeNaoExiste() {
 		Long cidadeId = 999L;
 
 		doThrow(new EmptyResultDataAccessException(1)).when(cidadeRepository).deleteById(cidadeId);
@@ -120,5 +119,32 @@ public class CadastroCidadeServiceTest {
 		
 		assertEquals("Cidade de código 10 não pode ser removida, pois está em uso", ex.getMessage());
 		verify(cidadeRepository).deleteById(cidadeId);		
+	}
+	
+	@Test
+	void testBuscarOuFalhar_ComSucesso() {
+		Long cidadeId = 10L;
+		
+		when(cidadeRepository.findById(cidadeId)).thenReturn(Optional.of(cidade));
+		
+		Cidade cidadeEncontrada = cadastroCidadeService.buscarOuFalhar(cidadeId);
+	
+		assertNotNull(cidadeEncontrada);
+		assertSame(cidade, cidadeEncontrada);
+		
+		verify(cidadeRepository).findById(cidadeId);
+	}
+	
+	@Test
+	void testBuscarOuFalhar_LancarExcecaoQuandoCidadeNaoExiste() {
+		Long cidadeId = 999L;
+		
+		when(cidadeRepository.findById(cidadeId)).thenReturn(Optional.empty());
+		
+		EntidadeNaoEncontradaException ex =
+				assertThrows(EntidadeNaoEncontradaException.class, () -> cadastroCidadeService.buscarOuFalhar(cidadeId));
+		
+		assertEquals("Não existe um cadastro de cidade com código 999", ex.getMessage());
+		verify(cidadeRepository).findById(cidadeId);
 	}
 }

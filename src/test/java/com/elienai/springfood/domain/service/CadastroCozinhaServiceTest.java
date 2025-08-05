@@ -10,6 +10,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -89,4 +91,31 @@ public class CadastroCozinhaServiceTest {
 		assertEquals("Cozinha de código 10 não pode ser removida, pois está em uso", ex.getMessage());
 		verify(cozinhaRepository).deleteById(cozinhaId);		
 	}
+	
+	@Test
+	void testBuscarOuFalhar_ComSucesso() {
+		Long cozinhaId = 10L;
+		
+		when(cozinhaRepository.findById(cozinhaId)).thenReturn(Optional.of(cozinha));
+		
+		Cozinha cozinhaEncontrada = cadastroCozinhaService.buscarOuFalhar(cozinhaId);
+	
+		assertNotNull(cozinhaEncontrada);
+		assertSame(cozinha, cozinhaEncontrada);
+		
+		verify(cozinhaRepository).findById(cozinhaId);
+	}
+	
+	@Test
+	void testBuscarOuFalhar_LancarExcecaoQuandoCozinhaNaoExiste() {
+		Long cozinhaId = 999L;
+		
+		when(cozinhaRepository.findById(cozinhaId)).thenReturn(Optional.empty());
+		
+		EntidadeNaoEncontradaException ex =
+				assertThrows(EntidadeNaoEncontradaException.class, () -> cadastroCozinhaService.buscarOuFalhar(cozinhaId));
+		
+		assertEquals("Não existe um cadastro de cozinha com código 999", ex.getMessage());
+		verify(cozinhaRepository).findById(cozinhaId);
+	}	
 }
