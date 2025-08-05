@@ -15,6 +15,9 @@ import com.elienai.springfood.domain.repository.RestauranteRepository;
 @Service
 public class CadastroRestauranteService {
 
+	private static final String MSG_RESTAURANTE_EM_USO = "Restaurante de código %d não pode ser removido, pois está em uso";
+	private static final String MSG_RESTAURANTE_NAO_ENCONTRADO = "Não existe um cadastro de restaurante com código %d";
+
 	@Autowired
 	private RestauranteRepository restauranteRepository;
 	
@@ -32,17 +35,23 @@ public class CadastroRestauranteService {
 		return restauranteRepository.save(restaurante);
 	}
 	
-	public void excluir(Long estadoId) {
+	public void excluir(Long restauranteId) {
 		try {
-			restauranteRepository.deleteById(estadoId);
+			restauranteRepository.deleteById(restauranteId);
 			
 		} catch (EmptyResultDataAccessException e) {
 			throw new EntidadeNaoEncontradaException(
-				String.format("Não existe um cadastro de restaurante com código %d", estadoId));
+				String.format(MSG_RESTAURANTE_NAO_ENCONTRADO, restauranteId));
 		
 		} catch (DataIntegrityViolationException e) {
 			throw new EntidadeEmUsoException(
-				String.format("Restaurante de código %d não pode ser removido, pois está em uso", estadoId));
+				String.format(MSG_RESTAURANTE_EM_USO, restauranteId));
 		}
-	}	
+	}
+	
+	public Restaurante buscarOuFalhar(Long restauranteId) {
+		return restauranteRepository.findById(restauranteId)
+				.orElseThrow(() -> new EntidadeNaoEncontradaException(
+				String.format(MSG_RESTAURANTE_NAO_ENCONTRADO, restauranteId)));
+	}
 }
