@@ -10,7 +10,6 @@ import com.elienai.springfood.domain.exception.EntidadeNaoEncontradaException;
 import com.elienai.springfood.domain.model.Cidade;
 import com.elienai.springfood.domain.model.Estado;
 import com.elienai.springfood.domain.repository.CidadeRepository;
-import com.elienai.springfood.domain.repository.EstadoRepository;
 
 @Service
 public class CadastroCidadeService {
@@ -22,13 +21,12 @@ public class CadastroCidadeService {
 	private CidadeRepository cidadeRepository;
 	
 	@Autowired
-	private EstadoRepository estadoRepository;
+	private CadastroEstadoService cadastroEstado;
 	
 	public Cidade salvar(Cidade cidade) {
 		Long estadoId = cidade.getEstado().getId();
-		Estado estado = estadoRepository.findById(estadoId)
-				.orElseThrow(() -> new EntidadeNaoEncontradaException(
-						String.format("Não existe cadastro de estado com código %d", estadoId)));
+		
+		Estado estado = cadastroEstado.buscarOuFalhar(estadoId);
 		
 		cidade.setEstado(estado);
 		

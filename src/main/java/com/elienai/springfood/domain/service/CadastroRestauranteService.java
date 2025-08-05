@@ -9,7 +9,6 @@ import com.elienai.springfood.domain.exception.EntidadeEmUsoException;
 import com.elienai.springfood.domain.exception.EntidadeNaoEncontradaException;
 import com.elienai.springfood.domain.model.Cozinha;
 import com.elienai.springfood.domain.model.Restaurante;
-import com.elienai.springfood.domain.repository.CozinhaRepository;
 import com.elienai.springfood.domain.repository.RestauranteRepository;
 
 @Service
@@ -22,13 +21,12 @@ public class CadastroRestauranteService {
 	private RestauranteRepository restauranteRepository;
 	
 	@Autowired
-	private CozinhaRepository cozinhaRepository;
+	private CadastroCozinhaService cadastroCozinha;
 	
 	public Restaurante salvar(Restaurante restaurante) {
 		Long cozinhaId = restaurante.getCozinha().getId();
-		Cozinha cozinha = cozinhaRepository.findById(cozinhaId)
-				.orElseThrow(() -> new EntidadeNaoEncontradaException(
-						String.format("Não existe cadastro de cozinha com código %d", cozinhaId)));
+		
+		Cozinha cozinha = cadastroCozinha.buscarOuFalhar(cozinhaId);
 		
 		restaurante.setCozinha(cozinha);
 		
