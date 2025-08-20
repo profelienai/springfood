@@ -40,8 +40,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	            + "Tente novamente e se o problema persistir, entre em contato "
 	            + "com o administrador do sistema.";
 		
-		// Exibindo a stacktrace enquantoe não estamos fazendo logging
-		ex.printStackTrace();
+		// Exibindo a stacktrace enquanto não estamos fazendo logging
+		//ex.printStackTrace();
 		
 		Problem problem = createProblemBuilder(status, problemType, detail)
 				.userMessage(detail)
