@@ -19,9 +19,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.elienai.springfood.domain.exception.EntidadeEmUsoException;
 import com.elienai.springfood.domain.exception.EntidadeNaoEncontradaException;
@@ -39,6 +41,9 @@ public class CadastroCidadeServiceTest {
 	@Mock
 	private EstadoRepository estadoRepository;
 	
+	@Spy
+    private CadastroEstadoService cadastroEstado;
+	
 	@InjectMocks
 	private CadastroCidadeService cadastroCidadeService;
 	
@@ -47,6 +52,8 @@ public class CadastroCidadeServiceTest {
 	
 	@BeforeEach
 	void setUp() {
+		ReflectionTestUtils.setField(cadastroEstado, "estadoRepository", estadoRepository);
+		
 		estado = new Estado();
 		estado.setId(1L);
 		
@@ -72,12 +79,14 @@ public class CadastroCidadeServiceTest {
 	
 	@Test
 	void testSalvar_LancarExcecaoQuandoEstadoNaoExiste() {
+		ReflectionTestUtils.setField(cadastroEstado, "estadoRepository", estadoRepository);
+		
 		when(estadoRepository.findById(1L)).thenReturn(Optional.empty());
 		
 		EntidadeNaoEncontradaException ex = 
 				assertThrows(EntidadeNaoEncontradaException.class,() -> cadastroCidadeService.salvar(cidade));
 		
-		assertEquals("Não existe cadastro de estado com código 1", ex.getMessage());
+		assertEquals("Não existe um cadastro de estado com código 1", ex.getMessage());
 		verify(estadoRepository).findById(1L);
 		verify(cidadeRepository, never()).save(any());
 	}

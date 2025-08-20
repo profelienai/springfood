@@ -19,9 +19,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.elienai.springfood.domain.exception.EntidadeEmUsoException;
 import com.elienai.springfood.domain.exception.EntidadeNaoEncontradaException;
@@ -42,17 +44,23 @@ public class CadastroRestauranteServiceTest {
 	@InjectMocks
 	private CadastroRestauranteService cadastroRestauranteService;
 	
+	@Spy
+	private CadastroCozinhaService cadastroCozinha;
+	
 	private Cozinha cozinha;
 	private Restaurante restaurante;
 	
 	@BeforeEach
 	void setUp() {
+		ReflectionTestUtils.setField(cadastroCozinha, "cozinhaRepository", cozinhaRepository);
+		
 		cozinha = new Cozinha();
 		cozinha.setId(1L);
 		
 		restaurante = new Restaurante();
 		restaurante.setId(10L);
 		restaurante.setCozinha(cozinha);
+		restaurante.setNome("NomeTeste");
 	}
 	
 	@Test
@@ -76,7 +84,7 @@ public class CadastroRestauranteServiceTest {
 		EntidadeNaoEncontradaException ex = 
 				assertThrows(EntidadeNaoEncontradaException.class,() -> cadastroRestauranteService.salvar(restaurante));
 		
-		assertEquals("Não existe cadastro de cozinha com código 1", ex.getMessage());
+		assertEquals("Não existe um cadastro de cozinha com código 1", ex.getMessage());
 		verify(cozinhaRepository).findById(1L);
 		verify(restauranteRepository, never()).save(any());
 	}
