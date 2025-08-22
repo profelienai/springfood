@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.elienai.springfood.core.validation.Groups;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,7 +18,7 @@ import lombok.EqualsAndHashCode;
 @Entity
 public class Estado {
 
-	@NotNull
+	@NotNull(groups = Groups.EstadoId.class)
 	@EqualsAndHashCode.Include
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
