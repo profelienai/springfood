@@ -19,17 +19,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.test.util.ReflectionTestUtils;
 
+import com.elienai.springfood.domain.exception.CozinhaNaoEncontradaException;
 import com.elienai.springfood.domain.exception.EntidadeEmUsoException;
 import com.elienai.springfood.domain.exception.EntidadeNaoEncontradaException;
 import com.elienai.springfood.domain.model.Cozinha;
 import com.elienai.springfood.domain.model.Restaurante;
-import com.elienai.springfood.domain.repository.CozinhaRepository;
 import com.elienai.springfood.domain.repository.RestauranteRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,13 +36,10 @@ public class CadastroRestauranteServiceTest {
 	@Mock
 	private RestauranteRepository restauranteRepository;
 	
-	@Mock
-	private CozinhaRepository cozinhaRepository;
-	
 	@InjectMocks
 	private CadastroRestauranteService cadastroRestauranteService;
 	
-	@Spy
+	@Mock
 	private CadastroCozinhaService cadastroCozinha;
 	
 	private Cozinha cozinha;
@@ -52,8 +47,6 @@ public class CadastroRestauranteServiceTest {
 	
 	@BeforeEach
 	void setUp() {
-		ReflectionTestUtils.setField(cadastroCozinha, "cozinhaRepository", cozinhaRepository);
-		
 		cozinha = new Cozinha();
 		cozinha.setId(1L);
 		
@@ -65,7 +58,7 @@ public class CadastroRestauranteServiceTest {
 	
 	@Test
 	void testSalvar_RestauranteComCozinhaExistente() {
-		when(cozinhaRepository.findById(1L)).thenReturn(Optional.of(cozinha));
+		when(cadastroCozinha.buscarOuFalhar(1L)).thenReturn(cozinha);
 		when(restauranteRepository.save(restaurante)).thenReturn(restaurante);
 		
 		Restaurante restauranteSalvo = cadastroRestauranteService.salvar(restaurante);
@@ -73,19 +66,19 @@ public class CadastroRestauranteServiceTest {
 		assertNotNull(restauranteSalvo);
 		assertSame(restaurante, restauranteSalvo);
 		
-		verify(cozinhaRepository).findById(1L);
+		verify(cadastroCozinha).buscarOuFalhar(1L);
 		verify(restauranteRepository).save(restaurante);
 	}
 	
 	@Test
 	void testSalvar_LancarExcecaoQuandoCozinhaNaoExiste() {
-		when(cozinhaRepository.findById(1L)).thenReturn(Optional.empty());
+		when(cadastroCozinha.buscarOuFalhar(1L)).thenThrow(new CozinhaNaoEncontradaException(1L));
 		
 		EntidadeNaoEncontradaException ex = 
 				assertThrows(EntidadeNaoEncontradaException.class,() -> cadastroRestauranteService.salvar(restaurante));
 		
 		assertEquals("Não existe um cadastro de cozinha com código 1", ex.getMessage());
-		verify(cozinhaRepository).findById(1L);
+		verify(cadastroCozinha).buscarOuFalhar(1L);
 		verify(restauranteRepository, never()).save(any());
 	}
 	

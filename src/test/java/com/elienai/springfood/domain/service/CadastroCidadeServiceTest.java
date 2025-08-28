@@ -19,18 +19,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.elienai.springfood.domain.exception.EntidadeEmUsoException;
 import com.elienai.springfood.domain.exception.EntidadeNaoEncontradaException;
+import com.elienai.springfood.domain.exception.EstadoNaoEncontradoException;
 import com.elienai.springfood.domain.model.Cidade;
 import com.elienai.springfood.domain.model.Estado;
 import com.elienai.springfood.domain.repository.CidadeRepository;
-import com.elienai.springfood.domain.repository.EstadoRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class CadastroCidadeServiceTest {
@@ -39,9 +37,6 @@ public class CadastroCidadeServiceTest {
 	private CidadeRepository cidadeRepository;
 	
 	@Mock
-	private EstadoRepository estadoRepository;
-	
-	@Spy
     private CadastroEstadoService cadastroEstado;
 	
 	@InjectMocks
@@ -52,8 +47,6 @@ public class CadastroCidadeServiceTest {
 	
 	@BeforeEach
 	void setUp() {
-		ReflectionTestUtils.setField(cadastroEstado, "estadoRepository", estadoRepository);
-		
 		estado = new Estado();
 		estado.setId(1L);
 		
@@ -65,7 +58,7 @@ public class CadastroCidadeServiceTest {
 	
 	@Test
 	void testSalvar_CidadeComEstadoExistente() {
-		when(estadoRepository.findById(1L)).thenReturn(Optional.of(estado));
+		when(cadastroEstado.buscarOuFalhar(1L)).thenReturn(estado);
 		when(cidadeRepository.save(cidade)).thenReturn(cidade);
 		
 		Cidade cidadeSalva = cadastroCidadeService.salvar(cidade);
@@ -73,21 +66,19 @@ public class CadastroCidadeServiceTest {
 		assertNotNull(cidadeSalva);
 		assertSame(cidade, cidadeSalva);
 		
-		verify(estadoRepository).findById(1L);
+		verify(cadastroEstado).buscarOuFalhar(1L);
 		verify(cidadeRepository).save(cidade);
 	}
 	
 	@Test
 	void testSalvar_LancarExcecaoQuandoEstadoNaoExiste() {
-		ReflectionTestUtils.setField(cadastroEstado, "estadoRepository", estadoRepository);
-		
-		when(estadoRepository.findById(1L)).thenReturn(Optional.empty());
+		when(cadastroEstado.buscarOuFalhar(1L)).thenThrow(new EstadoNaoEncontradoException(1L));
 		
 		EntidadeNaoEncontradaException ex = 
 				assertThrows(EntidadeNaoEncontradaException.class,() -> cadastroCidadeService.salvar(cidade));
 		
 		assertEquals("Não existe um cadastro de estado com código 1", ex.getMessage());
-		verify(estadoRepository).findById(1L);
+		verify(cadastroEstado).buscarOuFalhar(1L);
 		verify(cidadeRepository, never()).save(any());
 	}
 	
