@@ -127,6 +127,29 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
+      
+        <!-- Testes Unitários -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+
+      <!-- Testes de Integração -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <skipTests>${skipITs}</skipTests>
+		</configuration>
+        <executions>
+          <execution>
+            <id>integration-tests</id>
+            <goals>
+               <goal>integration-test</goal>
+             </goals>
+          </execution>
+        </executions>
+      </plugin>      
     </plugins>
   </build>
 
