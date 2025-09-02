@@ -53,11 +53,6 @@ public class CozinhaControllerTest {
 	}
 	
 	@Test
-	public void deveConterTodosOsEndpoints() throws Exception {
-		mockMvc.perform(get("/cozinhas"));
-	}
-	
-	@Test
 	public void deveListarCozinhas() throws Exception {
 		when(cozinhaRepository.findAll())
 			.thenReturn(Arrays.asList(cozinhaItaliana, cozinhaArabe));
