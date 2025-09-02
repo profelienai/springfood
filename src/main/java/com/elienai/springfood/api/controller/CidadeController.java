@@ -60,7 +60,7 @@ public class CidadeController {
 		BeanUtils.copyProperties(cidade, cidadeAtual, "id");
 				
 		try {
-			return cadastroCidade.salvar(cidade);
+			return cadastroCidade.salvar(cidadeAtual);
 		} catch (EntidadeNaoEncontradaException e) {
 			throw new NegocioException(e.getMessage());
 		}

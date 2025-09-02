@@ -60,7 +60,7 @@ public class RestauranteController {
 				"id", "formasPagamento", "endereco", "dataCadastro", "produtos");
 				
 		try {
-			return cadastroRestaurante.salvar(restaurante);
+			return cadastroRestaurante.salvar(restauranteAtual);
 		} catch (EntidadeNaoEncontradaException e) {
 			throw new NegocioException(e.getMessage());
 		}
