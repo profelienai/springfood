@@ -48,7 +48,7 @@ public class EstadoControllerIT {
 				"/json/correto/estado-sp.json");
 		
 		jsonEstadoComDadosInvalidos = ResourceUtils.getContentFromResource(
-				"/json/correto/estado-com-dados-invalidos.json");
+				"/json/incorreto/estado-com-dados-invalidos.json");
 		
 	}
 	

@@ -36,8 +36,8 @@ public class CidadeControllerIT {
 	private DatabaseCleaner databaseCleaner;
 	
 	private String jsonCidadeVR;
-	private String jsonCidadeComNomeInvalido;
-	private String jsonCidadeComEstadoInvalido;
+	private String jsonCidadeComDadosInvalidos;
+	private String jsonCidadeComIdEstadoNulo;
 	private String jsonCidadeComEstadoInexistente;
 	
 	@BeforeEach
@@ -49,14 +49,14 @@ public class CidadeControllerIT {
 		jsonCidadeVR = ResourceUtils.getContentFromResource(
 				"/json/correto/cidade-vr.json");
 		
-		jsonCidadeComNomeInvalido = ResourceUtils.getContentFromResource(
-				"/json/correto/cidade-com-nome-invalido.json");
+		jsonCidadeComDadosInvalidos = ResourceUtils.getContentFromResource(
+				"/json/incorreto/cidade-com-dados-invalidos.json");
 
-		jsonCidadeComEstadoInvalido = ResourceUtils.getContentFromResource(
-				"/json/correto/cidade-com-estado-invalido.json");	
+		jsonCidadeComIdEstadoNulo = ResourceUtils.getContentFromResource(
+				"/json/incorreto/cidade-com-id-estado-nulo.json.json");	
 		
 		jsonCidadeComEstadoInexistente = ResourceUtils.getContentFromResource(
-				"/json/correto/cidade-com-estado-inexistente.json");		
+				"/json/incorreto/cidade-com-estado-inexistente.json");		
 	}
 	
 	@AfterEach
@@ -155,9 +155,9 @@ public class CidadeControllerIT {
 
 		
 	@Test
-	public void deveRetornarStatus400_QuandoAdicionarCidadeComNomeInvalido() {
+	public void deveRetornarStatus400_QuandoAdicionarCidadeComDadosInvalidos() {
 		given()
-			.body(jsonCidadeComNomeInvalido)
+			.body(jsonCidadeComDadosInvalidos)
 			.contentType(ContentType.JSON)
 			.accept(ContentType.JSON)
 		.when()
@@ -167,14 +167,18 @@ public class CidadeControllerIT {
 			.body("status", is(400))
 			.body("title", is("Dados inválidos"))
 			.body("detail", containsString("Um ou mais campos estão inválidos"))
-			.body("objects[0].name", is("nome"))
-			.body("objects[0].userMessage", is("Nome da cidade é obrigatório"));		
+
+			.body("objects[0].name", is("estado"))
+			.body("objects[0].userMessage", is("Estado da cidade é obrigatório"))		
+			
+			.body("objects[1].name", is("nome"))
+			.body("objects[1].userMessage", is("Nome da cidade é obrigatório"));		
 	}	
 	
 	@Test
 	public void deveRetornarStatus400_QuandoAdicionarCidadeComEstadoInvalido() {
 		given()
-			.body(jsonCidadeComEstadoInvalido)
+			.body(jsonCidadeComIdEstadoNulo)
 			.contentType(ContentType.JSON)
 			.accept(ContentType.JSON)
 		.when()
@@ -208,7 +212,7 @@ public class CidadeControllerIT {
 	public void deveRetornarStatus400_QuandoAlterarCidadeComNomeInvalido() {
 		given()
 			.pathParam("cidadeId", 1L)
-			.body(jsonCidadeComNomeInvalido)
+			.body(jsonCidadeComDadosInvalidos)
 			.contentType(ContentType.JSON)
 			.accept(ContentType.JSON)
 		.when()

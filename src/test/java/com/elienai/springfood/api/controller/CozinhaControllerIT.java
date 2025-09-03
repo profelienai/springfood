@@ -48,7 +48,7 @@ public class CozinhaControllerIT {
 				"/json/correto/cozinha-brasileira.json");
 		
 		jsonCozinhaComDadosInvalidos = ResourceUtils.getContentFromResource(
-				"/json/correto/cozinha-com-dados-invalidos.json");
+				"/json/incorreto/cozinha-com-dados-invalidos.json");
 		
 	}
 	
@@ -66,7 +66,7 @@ public class CozinhaControllerIT {
 		.then()
 			.statusCode(HttpStatus.OK.value())
 	    	.body("", hasSize(2))    
-	    	.body("nome", hasItems("Italiana", "Árabe"));
+	    	.body("nome", hasItems("Italiana", "Arabe"));
 	}
 	
 	@Test
