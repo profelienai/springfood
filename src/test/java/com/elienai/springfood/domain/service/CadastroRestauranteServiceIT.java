@@ -60,7 +60,7 @@ public class CadastroRestauranteServiceIT {
 		Restaurante restaurante = cadastroRestaurante.buscarOuFalhar(1L);
 		
 		assertNotNull(restaurante);
-		assertEquals("Thai Gourmet", restaurante.getNome());
+		assertEquals("Aramad", restaurante.getNome());
 	}
 	
 	@Test
