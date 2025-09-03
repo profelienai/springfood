@@ -3,6 +3,7 @@ package com.elienai.springfood.api.controller;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -53,7 +54,7 @@ public class CidadeControllerIT {
 				"/json/incorreto/cidade-com-dados-invalidos.json");
 
 		jsonCidadeComIdEstadoNulo = ResourceUtils.getContentFromResource(
-				"/json/incorreto/cidade-com-id-estado-nulo.json.json");	
+				"/json/incorreto/cidade-com-id-estado-nulo.json");	
 		
 		jsonCidadeComEstadoInexistente = ResourceUtils.getContentFromResource(
 				"/json/incorreto/cidade-com-estado-inexistente.json");		
@@ -168,11 +169,13 @@ public class CidadeControllerIT {
 			.body("title", is("Dados inválidos"))
 			.body("detail", containsString("Um ou mais campos estão inválidos"))
 
-			.body("objects[0].name", is("estado"))
-			.body("objects[0].userMessage", is("Estado da cidade é obrigatório"))		
+			.body("objects", hasSize(2))
 			
-			.body("objects[1].name", is("nome"))
-			.body("objects[1].userMessage", is("Nome da cidade é obrigatório"));		
+			.body("objects.name", hasItem("estado"))
+			.body("objects.userMessage", hasItem("Estado da cidade é obrigatório"))		
+			
+			.body("objects.name", hasItem("nome"))
+			.body("objects.userMessage", hasItem("Nome da cidade é obrigatório"));		
 	}	
 	
 	@Test
@@ -188,6 +191,8 @@ public class CidadeControllerIT {
 			.body("status", is(400))
 			.body("title", is("Dados inválidos"))
 			.body("detail", containsString("Um ou mais campos estão inválidos"))
+			
+			.body("objects", hasSize(1))
 			.body("objects[0].name", is("estado.id"))
 			.body("objects[0].userMessage", is("Código do estado é obrigatório"));		
 	}
@@ -209,7 +214,7 @@ public class CidadeControllerIT {
 	}			
 	
 	@Test
-	public void deveRetornarStatus400_QuandoAlterarCidadeComNomeInvalido() {
+	public void deveRetornarStatus400_QuandoAlterarCidadeComDadosInvalidos() {
 		given()
 			.pathParam("cidadeId", 1L)
 			.body(jsonCidadeComDadosInvalidos)
@@ -222,8 +227,14 @@ public class CidadeControllerIT {
 			.body("status", is(400))
 			.body("title", is("Dados inválidos"))
 			.body("detail", containsString("Um ou mais campos estão inválidos"))
-			.body("objects[0].name", is("nome"))
-			.body("objects[0].userMessage", is("Nome da cidade é obrigatório"));		
+			
+			.body("objects", hasSize(2))
+			
+			.body("objects.name", hasItem("estado"))
+			.body("objects.userMessage", hasItem("Estado da cidade é obrigatório"))		
+			
+			.body("objects.name", hasItem("nome"))
+			.body("objects.userMessage", hasItem("Nome da cidade é obrigatório"));			
 	}		
 	
 	@Test
