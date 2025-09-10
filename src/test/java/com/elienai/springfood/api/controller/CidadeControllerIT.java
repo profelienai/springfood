@@ -40,6 +40,7 @@ public class CidadeControllerIT {
 	private String jsonCidadeComDadosInvalidos;
 	private String jsonCidadeComIdEstadoNulo;
 	private String jsonCidadeComEstadoInexistente;
+	private String jsonCidadeComAtributoInexistente;
 	
 	@BeforeEach
 	private void setUp() {
@@ -57,7 +58,10 @@ public class CidadeControllerIT {
 				"/json/incorreto/cidade-com-id-estado-nulo.json");	
 		
 		jsonCidadeComEstadoInexistente = ResourceUtils.getContentFromResource(
-				"/json/incorreto/cidade-com-estado-inexistente.json");		
+				"/json/incorreto/cidade-com-estado-inexistente.json");
+		
+		jsonCidadeComAtributoInexistente = ResourceUtils.getContentFromResource(
+				"/json/incorreto/cidade-com-atributo-inexistente.json");				
 	}
 	
 	@AfterEach
@@ -211,7 +215,23 @@ public class CidadeControllerIT {
 			.body("title", is("Violação de regra de negócio"))
 			.body("detail", is("Não existe um cadastro de estado com código 99"))
 			.body("userMessage", is("Não existe um cadastro de estado com código 99"));		
-	}			
+	}
+
+	@Test
+	public void deveRetornarStatus400_QuandoAdicionarCidadeComAtributoInexistente() {
+		given()
+			.body(jsonCidadeComAtributoInexistente)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.post()
+		.then()
+			.statusCode(HttpStatus.BAD_REQUEST.value())
+			.body("status", is(400))
+			.body("title", is("Mensagem incompreensível"))
+			.body("detail", is("A propriedade 'estado.nome' não existe. Corrija ou remova essa propriedade e tente novamente."))
+			.body("userMessage", is("Ocorreu um erro interno inesperado no sistema. Tente novamente e se o problema persistir, entre em contato com o administrador do sistema."));		
+	}
 	
 	@Test
 	public void deveRetornarStatus400_QuandoAlterarCidadeComDadosInvalidos() {
@@ -272,6 +292,23 @@ public class CidadeControllerIT {
 			.body("userMessage", is("Não existe um cadastro de estado com código 99"));		
 	}		
 
+	@Test
+	public void deveRetornarStatus400_QuandoAlterarCidadeComAtributoInexistente() {
+		given()
+			.pathParam("cidadeId", 1L)
+			.body(jsonCidadeComAtributoInexistente)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/{cidadeId}")
+		.then()
+			.statusCode(HttpStatus.BAD_REQUEST.value())
+			.body("status", is(400))
+			.body("title", is("Mensagem incompreensível"))
+			.body("detail", is("A propriedade 'estado.nome' não existe. Corrija ou remova essa propriedade e tente novamente."))
+			.body("userMessage", is("Ocorreu um erro interno inesperado no sistema. Tente novamente e se o problema persistir, entre em contato com o administrador do sistema."));		
+	}	
+	
 	@Test
 	public void deveRetornarStatus404_QuandoRemoverCidadeInexistente() {
 		given()

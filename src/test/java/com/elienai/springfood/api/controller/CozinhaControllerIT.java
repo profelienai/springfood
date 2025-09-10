@@ -37,6 +37,7 @@ public class CozinhaControllerIT {
 	
 	private String jsonCozinhaBrasileira;
 	private String jsonCozinhaComDadosInvalidos;
+	private String jsonCozinhaComAtributoInexistente;
 	
 	@BeforeEach
 	private void setUp() {
@@ -49,7 +50,9 @@ public class CozinhaControllerIT {
 		
 		jsonCozinhaComDadosInvalidos = ResourceUtils.getContentFromResource(
 				"/json/incorreto/cozinha-com-dados-invalidos.json");
-		
+
+		jsonCozinhaComAtributoInexistente = ResourceUtils.getContentFromResource(
+				"/json/incorreto/cozinha-com-atributo-inexistente.json");		
 	}
 	
 	@AfterEach
@@ -156,6 +159,22 @@ public class CozinhaControllerIT {
 	}	
 	
 	@Test
+	public void deveRetornarStatus400_QuandoAdicionarCozinhaComAtributoInexistente() {
+		given()
+			.body(jsonCozinhaComAtributoInexistente)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.post()
+		.then()
+			.statusCode(HttpStatus.BAD_REQUEST.value())
+			.body("status", is(400))
+			.body("title", is("Mensagem incompreensível"))
+			.body("detail", is("A propriedade 'atr_inexistente' não existe. Corrija ou remova essa propriedade e tente novamente."))
+			.body("userMessage", is("Ocorreu um erro interno inesperado no sistema. Tente novamente e se o problema persistir, entre em contato com o administrador do sistema."));		
+	}		
+	
+	@Test
 	public void deveRetornarStatus404_QuandoAlterarCozinhaInexistente() {
 		given()
 			.pathParam("cozinhaId", 99L)
@@ -190,6 +209,23 @@ public class CozinhaControllerIT {
 			.body("objects[0].name", is("nome"))
 			.body("objects[0].userMessage", is("Nome da cozinha é obrigatório"));		
 	}	
+	
+	@Test
+	public void deveRetornarStatus400_QuandoAlterarCozinhaComAtributoInexistente() {
+		given()
+			.pathParam("cozinhaId", 99L)
+			.body(jsonCozinhaComAtributoInexistente)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/{cozinhaId}")
+		.then()
+			.statusCode(HttpStatus.BAD_REQUEST.value())
+			.body("status", is(400))
+			.body("title", is("Mensagem incompreensível"))
+			.body("detail", is("A propriedade 'atr_inexistente' não existe. Corrija ou remova essa propriedade e tente novamente."))
+			.body("userMessage", is("Ocorreu um erro interno inesperado no sistema. Tente novamente e se o problema persistir, entre em contato com o administrador do sistema."));		
+	}		
 	
 	@Test
 	public void deveRetornarStatus404_QuandoRemoverCozinhaInexistente() {

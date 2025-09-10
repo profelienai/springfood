@@ -1,0 +1,8 @@
+{
+    "nome": "Cadore",
+    "taxaFrete": 10.99,
+    "cozinha": {
+        "id": 1,
+        "nome": "Brasileira"
+    }
+}

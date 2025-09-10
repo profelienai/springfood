@@ -37,6 +37,7 @@ public class EstadoControllerIT {
 	
 	private String jsonEstadoSP;
 	private String jsonEstadoComDadosInvalidos;
+	private String jsonEstadoComAtributoInexistente;
 	
 	@BeforeEach
 	private void setUp() {
@@ -50,6 +51,8 @@ public class EstadoControllerIT {
 		jsonEstadoComDadosInvalidos = ResourceUtils.getContentFromResource(
 				"/json/incorreto/estado-com-dados-invalidos.json");
 		
+		jsonEstadoComAtributoInexistente = ResourceUtils.getContentFromResource(
+				"/json/incorreto/estado-com-atributo-inexistente.json");		
 	}
 	
 	@AfterEach
@@ -156,6 +159,22 @@ public class EstadoControllerIT {
 	}	
 	
 	@Test
+	public void deveRetornarStatus400_QuandoAdicionarEstadoComAtributoInexistente() {
+		given()
+			.body(jsonEstadoComAtributoInexistente)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.post()
+		.then()
+			.statusCode(HttpStatus.BAD_REQUEST.value())
+			.body("status", is(400))
+			.body("title", is("Mensagem incompreensível"))
+			.body("detail", is("A propriedade 'atr_inexistente' não existe. Corrija ou remova essa propriedade e tente novamente."))
+			.body("userMessage", is("Ocorreu um erro interno inesperado no sistema. Tente novamente e se o problema persistir, entre em contato com o administrador do sistema."));
+	}		
+	
+	@Test
 	public void deveRetornarStatus404_QuandoAlterarEstadoInexistente() {
 		given()
 			.pathParam("estadoId", 99L)
@@ -190,6 +209,23 @@ public class EstadoControllerIT {
 			.body("objects[0].name", is("nome"))
 			.body("objects[0].userMessage", is("Nome do estado é obrigatório"));		
 	}	
+	
+	@Test
+	public void deveRetornarStatus400_QuandoAlterarEstadoComAtributoInexistente() {
+		given()
+			.pathParam("estadoId", 99L)
+			.body(jsonEstadoComAtributoInexistente)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/{estadoId}")
+		.then()
+			.statusCode(HttpStatus.BAD_REQUEST.value())
+			.body("status", is(400))
+			.body("title", is("Mensagem incompreensível"))
+			.body("detail", is("A propriedade 'atr_inexistente' não existe. Corrija ou remova essa propriedade e tente novamente."))
+			.body("userMessage", is("Ocorreu um erro interno inesperado no sistema. Tente novamente e se o problema persistir, entre em contato com o administrador do sistema."));
+	}		
 	
 	@Test
 	public void deveRetornarStatus404_QuandoRemoverEstadoInexistente() {

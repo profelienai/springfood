@@ -42,6 +42,7 @@ public class RestauranteControllerIT {
 	private String jsonRestauranteComDadosInvalidos;
 	private String jsonRestauranteComIdCozinhaNulo;
 	private String jsonRestauranteComCozinhaInexistente;
+	private String jsonRestauranteComAtributoInexistente;
 	
 	@BeforeEach
 	private void setUp() {
@@ -59,7 +60,11 @@ public class RestauranteControllerIT {
 				"/json/incorreto/restaurante-com-id-cozinha-nulo.json");	
 		
 		jsonRestauranteComCozinhaInexistente = ResourceUtils.getContentFromResource(
-				"/json/incorreto/restaurante-com-cozinha-inexistente.json");		
+				"/json/incorreto/restaurante-com-cozinha-inexistente.json");
+		
+		jsonRestauranteComAtributoInexistente = ResourceUtils.getContentFromResource(
+				"/json/incorreto/restaurante-com-atributo-inexistente.json");		
+		
 	}
 	
 	@AfterEach
@@ -226,8 +231,25 @@ public class RestauranteControllerIT {
 			.body("status", is(400))
 			.body("title", is("Violação de regra de negócio"))
 			.body("detail", is("Não existe um cadastro de cozinha com código 99"))
-			.body("userMessage", is("Não existe um cadastro de cozinha com código 99"));		
-	}			
+			.body("userMessage", is("Não existe um cadastro de cozinha com código 99"));
+
+	}	
+	
+	@Test
+	public void deveRetornarStatus400_QuandoAdicionarRestauranteComAtributoInexistente() {
+		given()
+			.body(jsonRestauranteComAtributoInexistente)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.post()
+		.then()
+			.statusCode(HttpStatus.BAD_REQUEST.value())
+			.body("status", is(400))
+			.body("title", is("Mensagem incompreensível"))
+			.body("detail", is("A propriedade 'cozinha.nome' não existe. Corrija ou remova essa propriedade e tente novamente."))
+			.body("userMessage", is("Ocorreu um erro interno inesperado no sistema. Tente novamente e se o problema persistir, entre em contato com o administrador do sistema."));		
+	}		
 	
 	@Test
 	public void deveRetornarStatus400_QuandoAlterarRestauranteComDadosInvalidos() {
@@ -289,6 +311,23 @@ public class RestauranteControllerIT {
 			.body("title", is("Violação de regra de negócio"))
 			.body("detail", is("Não existe um cadastro de cozinha com código 99"))
 			.body("userMessage", is("Não existe um cadastro de cozinha com código 99"));		
+	}		
+	
+	@Test
+	public void deveRetornarStatus400_QuandoAlterarRestauranteComAtributoInexistente() {
+		given()
+			.pathParam("restauranteId", 1L)
+			.body(jsonRestauranteComAtributoInexistente)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/{restauranteId}")
+		.then()
+			.statusCode(HttpStatus.BAD_REQUEST.value())
+			.body("status", is(400))
+			.body("title", is("Mensagem incompreensível"))
+			.body("detail", is("A propriedade 'cozinha.nome' não existe. Corrija ou remova essa propriedade e tente novamente."))
+			.body("userMessage", is("Ocorreu um erro interno inesperado no sistema. Tente novamente e se o problema persistir, entre em contato com o administrador do sistema."));		
 	}		
 
 	@Test
