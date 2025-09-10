@@ -14,7 +14,6 @@ import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
 import com.elienai.springfood.core.validation.Groups;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,7 +32,6 @@ public class Cidade {
 	@Column(nullable = false)
 	private String nome;
 	
-	@JsonIgnoreProperties(value = "nome", allowGetters = true)
 	@ConvertGroup(from = Default.class, to = Groups.EstadoId.class)
 	@Valid @NotNull
 	@ManyToOne
