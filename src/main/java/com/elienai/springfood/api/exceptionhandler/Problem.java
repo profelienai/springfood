@@ -1,8 +1,9 @@
 package com.elienai.springfood.api.exceptionhandler;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -15,7 +16,8 @@ import lombok.Getter;
 public class Problem {
 
 	private Integer status;
-	private LocalDateTime timestamp;
+	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssX")
+	private OffsetDateTime timestamp;
 	private String type;
 	private String title;
 	private String detail;

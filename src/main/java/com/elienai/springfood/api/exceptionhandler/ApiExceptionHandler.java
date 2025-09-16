@@ -1,6 +1,6 @@
 package com.elienai.springfood.api.exceptionhandler;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -232,14 +232,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		if (body == null) {
 			body = Problem.builder()
-					.timestamp(LocalDateTime.now())
+					.timestamp(OffsetDateTime.now())
 					.title(status.getReasonPhrase())
 					.status(status.value())
 					.userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
 					.build();			
 		} else if (body instanceof String) {
 			body = Problem.builder()
-					.timestamp(LocalDateTime.now())
+					.timestamp(OffsetDateTime.now())
 					.title((String) body)
 					.status(status.value())
 					.userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
@@ -252,7 +252,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	private Problem.ProblemBuilder createProblemBuilder(HttpStatus status, ProblemType problemType, String detail) {
 		return Problem.builder()
 				.status(status.value())
-				.timestamp(LocalDateTime.now())
+				.timestamp(OffsetDateTime.now())
 				.type(problemType.getUri())
 				.title(problemType.getTitle())
 				.detail(detail);
