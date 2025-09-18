@@ -3,6 +3,7 @@ package com.elienai.springfood.api.controller;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -13,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.elienai.springfood.api.dto.EstadoRequest;
+import com.elienai.springfood.api.dto.EstadoResponse;
+import com.elienai.springfood.api.mapper.EstadoRequestMapper;
+import com.elienai.springfood.api.mapper.EstadoResponseMapper;
 import com.elienai.springfood.domain.model.Estado;
 import com.elienai.springfood.domain.repository.EstadoRepository;
 import com.elienai.springfood.domain.service.CadastroEstadoService;
@@ -38,10 +44,20 @@ public class EstadoControllerTest {
 	
 	@MockBean
 	private CadastroEstadoService cadastroEstado;
+	
+	@MockBean
+	private EstadoResponseMapper estadoResponseMapper;
 
+	@MockBean
+	private EstadoRequestMapper estadoRequestMapper;
+	
 	private Estado estadoRJ;
 	private Estado estadoMG;
 	private Estado estadoSP;
+
+	private EstadoResponse estadoResponseRJ;
+	private EstadoResponse estadoResponseMG;
+	private EstadoResponse estadoResponseSP;
 	
 	private String jsonEstadoSP;
 	
@@ -54,8 +70,11 @@ public class EstadoControllerTest {
 	
 	@Test
 	public void deveListarEstados() throws Exception {
-		when(estadoRepository.findAll())
-			.thenReturn(Arrays.asList(estadoRJ, estadoMG));
+		List<Estado> estados = Arrays.asList(estadoRJ, estadoMG);
+		List<EstadoResponse> responses = Arrays.asList(estadoResponseRJ, estadoResponseMG);
+		
+		when(estadoRepository.findAll()).thenReturn(estados);
+		when(estadoResponseMapper.toCollectionResponse(estados)).thenReturn(responses);
 		
 		mockMvc.perform(get("/estados")
 					.accept(MediaType.APPLICATION_JSON))
@@ -67,8 +86,8 @@ public class EstadoControllerTest {
 	
 	@Test
 	public void deveBuscarEstadoPorId() throws Exception {
-		when(cadastroEstado.buscarOuFalhar(1L))
-			.thenReturn(estadoRJ);
+		when(cadastroEstado.buscarOuFalhar(1L)).thenReturn(estadoRJ);
+		when(estadoResponseMapper.toResponse(estadoRJ)).thenReturn(estadoResponseRJ);
 		
 		mockMvc.perform(get("/estados/{id}", 1L)
 				.accept(MediaType.APPLICATION_JSON))
@@ -78,8 +97,9 @@ public class EstadoControllerTest {
 	
 	@Test
 	public void deveAdicionarEstado() throws Exception {
-		when(cadastroEstado.salvar(any(Estado.class)))
-			.thenReturn(estadoSP);
+		when(estadoRequestMapper.toDomainObject(any(EstadoRequest.class))).thenReturn(estadoSP);
+		when(cadastroEstado.salvar(estadoSP)).thenReturn(estadoSP);
+		when(estadoResponseMapper.toResponse(estadoSP)).thenReturn(estadoResponseSP);
 		
 		mockMvc.perform(post("/estados")
 				.content(jsonEstadoSP)
@@ -91,8 +111,10 @@ public class EstadoControllerTest {
 	
 	@Test
 	public void deveAtualizarEstado() throws Exception {
-		when(cadastroEstado.buscarOuFalhar(1L)).thenReturn(estadoRJ);
-		when(cadastroEstado.salvar(any(Estado.class))).thenReturn(estadoSP);
+		when(cadastroEstado.buscarOuFalhar(1L)).thenReturn(estadoSP);
+		doNothing().when(estadoRequestMapper).copyToDomainObject(any(EstadoRequest.class), any(Estado.class));
+		when(cadastroEstado.salvar(estadoSP)).thenReturn(estadoSP);
+		when(estadoResponseMapper.toResponse(estadoSP)).thenReturn(estadoResponseSP);
 		
 		mockMvc.perform(put("/estados/{id}", 1L)
 				.content(jsonEstadoSP)
@@ -121,6 +143,19 @@ public class EstadoControllerTest {
 		
 		estadoSP = new Estado();
 		estadoSP.setId(1L);
-		estadoSP.setNome("São Paulo");		
+		estadoSP.setNome("São Paulo");
+		
+		
+		estadoResponseRJ = new EstadoResponse();
+		estadoResponseRJ.setId(1L);
+		estadoResponseRJ.setNome("Rio de Janeiro");
+		
+		estadoResponseMG = new EstadoResponse();
+		estadoResponseMG.setId(2L);
+		estadoResponseMG.setNome("Minas Gerais");
+		
+		estadoResponseSP = new EstadoResponse();
+		estadoResponseSP.setId(1L);
+		estadoResponseSP.setNome("São Paulo");		
 	}
 }
