@@ -3,6 +3,7 @@ package com.elienai.springfood.api.controller;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -13,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.elienai.springfood.api.dto.CozinhaRequest;
+import com.elienai.springfood.api.dto.CozinhaResponse;
+import com.elienai.springfood.api.mapper.CozinhaRequestMapper;
+import com.elienai.springfood.api.mapper.CozinhaResponseMapper;
 import com.elienai.springfood.domain.model.Cozinha;
 import com.elienai.springfood.domain.repository.CozinhaRepository;
 import com.elienai.springfood.domain.service.CadastroCozinhaService;
@@ -39,9 +45,19 @@ public class CozinhaControllerTest {
 	@MockBean
 	private CadastroCozinhaService cadastroCozinha;
 
+	@MockBean
+	private CozinhaResponseMapper cozinhaResponseMapper;
+
+	@MockBean
+	private CozinhaRequestMapper cozinhaRequestMapper;
+	
 	private Cozinha cozinhaItaliana;
 	private Cozinha cozinhaArabe;
 	private Cozinha cozinhaBrasileira;
+	
+	private CozinhaResponse cozinhaItalianaResponse;
+	private CozinhaResponse cozinhaArabeResponse;
+	private CozinhaResponse cozinhaBrasileiraResponse;
 	
 	private String jsonCozinhaBrasileira;
 	
@@ -54,8 +70,11 @@ public class CozinhaControllerTest {
 	
 	@Test
 	public void deveListarCozinhas() throws Exception {
-		when(cozinhaRepository.findAll())
-			.thenReturn(Arrays.asList(cozinhaItaliana, cozinhaArabe));
+		List<Cozinha> cozinhas = Arrays.asList(cozinhaItaliana, cozinhaArabe);
+		List<CozinhaResponse> responses = Arrays.asList(cozinhaItalianaResponse, cozinhaArabeResponse);
+		
+		when(cozinhaRepository.findAll()).thenReturn(cozinhas);
+		when(cozinhaResponseMapper.toCollectionResponse(cozinhas)).thenReturn(responses);
 		
 		mockMvc.perform(get("/cozinhas")
 					.accept(MediaType.APPLICATION_JSON))
@@ -67,8 +86,8 @@ public class CozinhaControllerTest {
 	
 	@Test
 	public void deveBuscarCozinhaPorId() throws Exception {
-		when(cadastroCozinha.buscarOuFalhar(1L))
-			.thenReturn(cozinhaItaliana);
+		when(cadastroCozinha.buscarOuFalhar(1L)).thenReturn(cozinhaItaliana);
+		when(cozinhaResponseMapper.toResponse(cozinhaItaliana)).thenReturn(cozinhaItalianaResponse);
 		
 		mockMvc.perform(get("/cozinhas/{id}", 1L)
 				.accept(MediaType.APPLICATION_JSON))
@@ -78,8 +97,9 @@ public class CozinhaControllerTest {
 	
 	@Test
 	public void deveAdicionarCozinha() throws Exception {
-		when(cadastroCozinha.salvar(any(Cozinha.class)))
-			.thenReturn(cozinhaBrasileira);
+		when(cozinhaRequestMapper.toDomainObject(any(CozinhaRequest.class))).thenReturn(cozinhaBrasileira);
+		when(cadastroCozinha.salvar(any(Cozinha.class))).thenReturn(cozinhaBrasileira);
+		when(cozinhaResponseMapper.toResponse(cozinhaBrasileira)).thenReturn(cozinhaBrasileiraResponse);
 		
 		mockMvc.perform(post("/cozinhas")
 				.content(jsonCozinhaBrasileira)
@@ -92,7 +112,9 @@ public class CozinhaControllerTest {
 	@Test
 	public void deveAtualizarCozinha() throws Exception {
 		when(cadastroCozinha.buscarOuFalhar(1L)).thenReturn(cozinhaItaliana);
-		when(cadastroCozinha.salvar(any(Cozinha.class))).thenReturn(cozinhaBrasileira);
+		doNothing().when(cozinhaRequestMapper).copyToDomainObject(any(CozinhaRequest.class), any(Cozinha.class));
+		when(cadastroCozinha.salvar(cozinhaBrasileira)).thenReturn(cozinhaBrasileira);
+		when(cozinhaResponseMapper.toResponse(cozinhaBrasileira)).thenReturn(cozinhaBrasileiraResponse);
 		
 		mockMvc.perform(put("/cozinhas/{id}", 1L)
 				.content(jsonCozinhaBrasileira)
@@ -121,6 +143,18 @@ public class CozinhaControllerTest {
 		
 		cozinhaBrasileira = new Cozinha();
 		cozinhaBrasileira.setId(1L);
-		cozinhaBrasileira.setNome("Brasileira");		
+		cozinhaBrasileira.setNome("Brasileira");
+		
+		cozinhaItalianaResponse = new CozinhaResponse();
+		cozinhaItalianaResponse.setId(1L);
+		cozinhaItalianaResponse.setNome("Italiana");
+
+		cozinhaArabeResponse = new CozinhaResponse();
+		cozinhaArabeResponse.setId(2L);
+		cozinhaArabeResponse.setNome("Árabe");
+		
+		cozinhaBrasileiraResponse = new CozinhaResponse();
+		cozinhaBrasileiraResponse.setId(1L);
+		cozinhaBrasileiraResponse.setNome("Brasileira");
 	}
 }
