@@ -3,7 +3,6 @@ package com.elienai.springfood.api.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
