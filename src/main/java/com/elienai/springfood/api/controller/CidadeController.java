@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.elienai.springfood.api.dto.CidadeRequest;
+import com.elienai.springfood.api.dto.CidadeResponse;
+import com.elienai.springfood.api.mapper.CidadeRequestMapper;
+import com.elienai.springfood.api.mapper.CidadeResponseMapper;
 import com.elienai.springfood.domain.exception.EntidadeNaoEncontradaException;
 import com.elienai.springfood.domain.exception.NegocioException;
 import com.elienai.springfood.domain.model.Cidade;
@@ -33,34 +36,46 @@ public class CidadeController {
 	@Autowired
 	private CadastroCidadeService cadastroCidade;	
 	
+	@Autowired
+	private CidadeRequestMapper cidadeRequestMapper;
+	
+	@Autowired
+	private CidadeResponseMapper cidadeResponseMapper;
+	
 	@GetMapping
-	public List<Cidade> listar() {
-		return cidadeRepository.findAll();
+	public List<CidadeResponse> listar() {
+		List<Cidade> cidades = cidadeRepository.findAll();
+		return cidadeResponseMapper.toCollectionResponse(cidades); 
 	}
 	
 	@GetMapping("/{cidadeId}")
-	public Cidade buscar(@PathVariable Long cidadeId) {
-		return cadastroCidade.buscarOuFalhar(cidadeId);
+	public CidadeResponse buscar(@PathVariable Long cidadeId) {
+		Cidade cidade = cadastroCidade.buscarOuFalhar(cidadeId);
+		return cidadeResponseMapper.toResponse(cidade);
 	}
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Cidade adicionar(@RequestBody @Valid Cidade cidade) {
+	public CidadeResponse adicionar(@RequestBody @Valid CidadeRequest cidadeRequest) {
 		try {
-			return cadastroCidade.salvar(cidade);
+			Cidade cidade = cidadeRequestMapper.toDomainObject(cidadeRequest);
+			cidade = cadastroCidade.salvar(cidade);
+			
+			return cidadeResponseMapper.toResponse(cidade);
 		} catch (EntidadeNaoEncontradaException e) {
 			throw new NegocioException(e.getMessage());
 		}
 	}
 	
 	@PutMapping("/{cidadeId}")
-	public Cidade atualizar(@PathVariable Long cidadeId, @RequestBody @Valid Cidade cidade) {
+	public CidadeResponse atualizar(@PathVariable Long cidadeId, @RequestBody @Valid CidadeRequest cidadeRequest) {
 		Cidade cidadeAtual = cadastroCidade.buscarOuFalhar(cidadeId);
-		
-		BeanUtils.copyProperties(cidade, cidadeAtual, "id");
-				
+
 		try {
-			return cadastroCidade.salvar(cidadeAtual);
+			cidadeRequestMapper.copyToDomainObject(cidadeRequest, cidadeAtual);
+			cidadeAtual = cadastroCidade.salvar(cidadeAtual);
+			
+			return cidadeResponseMapper.toResponse(cidadeAtual);
 		} catch (EntidadeNaoEncontradaException e) {
 			throw new NegocioException(e.getMessage());
 		}

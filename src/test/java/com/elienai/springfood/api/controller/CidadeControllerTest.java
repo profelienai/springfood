@@ -3,6 +3,7 @@ package com.elienai.springfood.api.controller;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -13,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.elienai.springfood.api.dto.CidadeRequest;
+import com.elienai.springfood.api.dto.CidadeResponse;
+import com.elienai.springfood.api.dto.EstadoResponse;
+import com.elienai.springfood.api.mapper.CidadeRequestMapper;
+import com.elienai.springfood.api.mapper.CidadeResponseMapper;
 import com.elienai.springfood.domain.model.Cidade;
 import com.elienai.springfood.domain.model.Estado;
 import com.elienai.springfood.domain.repository.CidadeRepository;
@@ -40,9 +47,19 @@ public class CidadeControllerTest {
 	@MockBean
 	private CadastroCidadeService cadastroCidade;
 
-	private Cidade cidadeBH;	
+	@MockBean
+	private CidadeResponseMapper cidadeResponseMapper;
+
+	@MockBean
+	private CidadeRequestMapper cidadeRequestMapper;	
+
 	private Cidade cidadeRJ;
+	private Cidade cidadeBH;	
 	private Cidade cidadeVR;
+	
+	private CidadeResponse cidadeResponseRJ;
+	private CidadeResponse cidadeResponseBH;
+	private CidadeResponse cidadeResponseVR;	
 	
 	private String jsonCidadeVR;
 	
@@ -55,8 +72,11 @@ public class CidadeControllerTest {
 	
 	@Test
 	public void deveListarCidades() throws Exception {
-		when(cidadeRepository.findAll())
-			.thenReturn(Arrays.asList(cidadeBH, cidadeRJ));
+		List<Cidade> cidades = Arrays.asList(cidadeBH, cidadeRJ);
+		List<CidadeResponse> responses = Arrays.asList(cidadeResponseBH, cidadeResponseRJ);
+		
+		when(cidadeRepository.findAll()).thenReturn(cidades);
+		when(cidadeResponseMapper.toCollectionResponse(cidades)).thenReturn(responses);
 		
 		mockMvc.perform(get("/cidades")
 					.accept(MediaType.APPLICATION_JSON))
@@ -70,8 +90,8 @@ public class CidadeControllerTest {
 	
 	@Test
 	public void deveBuscarCidadePorId() throws Exception {
-		when(cadastroCidade.buscarOuFalhar(1L))
-			.thenReturn(cidadeRJ);
+		when(cadastroCidade.buscarOuFalhar(1L)).thenReturn(cidadeRJ);
+		when(cidadeResponseMapper.toResponse(cidadeRJ)).thenReturn(cidadeResponseRJ);
 		
 		mockMvc.perform(get("/cidades/{id}", 1L)
 				.accept(MediaType.APPLICATION_JSON))
@@ -82,8 +102,9 @@ public class CidadeControllerTest {
 	
 	@Test
 	public void deveAdicionarCidade() throws Exception {
-		when(cadastroCidade.salvar(any(Cidade.class)))
-			.thenReturn(cidadeVR);
+		when(cidadeRequestMapper.toDomainObject(any(CidadeRequest.class))).thenReturn(cidadeVR);
+		when(cadastroCidade.salvar(cidadeVR)).thenReturn(cidadeVR);
+		when(cidadeResponseMapper.toResponse(cidadeVR)).thenReturn(cidadeResponseVR);
 		
 		mockMvc.perform(post("/cidades")
 				.content(jsonCidadeVR)
@@ -97,7 +118,9 @@ public class CidadeControllerTest {
 	@Test
 	public void deveAtualizarCidade() throws Exception {
 		when(cadastroCidade.buscarOuFalhar(1L)).thenReturn(cidadeRJ);
-		when(cadastroCidade.salvar(any(Cidade.class))).thenReturn(cidadeVR);
+		doNothing().when(cidadeRequestMapper).copyToDomainObject(any(CidadeRequest.class), any(Cidade.class));
+		when(cadastroCidade.salvar(cidadeRJ)).thenReturn(cidadeVR);
+		when(cidadeResponseMapper.toResponse(cidadeVR)).thenReturn(cidadeResponseVR);
 		
 		mockMvc.perform(put("/cidades/{id}", 1L)
 				.content(jsonCidadeVR)
@@ -117,11 +140,11 @@ public class CidadeControllerTest {
 	}
 	
 	private void prepararDados() {
-		Estado estadoRJ = new Estado();
+		var estadoRJ = new Estado();
 		estadoRJ.setId(1L);
 		estadoRJ.setNome("Rio de Janeiro");
 
-		Estado estadoMG = new Estado();
+		var estadoMG = new Estado();
 		estadoMG.setId(2L);
 		estadoMG.setNome("Minas Gerais");		
 		
@@ -139,5 +162,29 @@ public class CidadeControllerTest {
 		cidadeVR.setId(1L);
 		cidadeVR.setNome("Volta Redonda");
 		cidadeVR.setEstado(estadoRJ);
+		
+		
+		var estadoResponseRJ = new EstadoResponse();
+		estadoResponseRJ.setId(1L);
+		estadoResponseRJ.setNome("Rio de Janeiro");
+
+		var estadoResponseMG = new EstadoResponse();
+		estadoResponseMG.setId(2L);
+		estadoResponseMG.setNome("Minas Gerais");			
+		
+		cidadeResponseBH = new CidadeResponse();
+		cidadeResponseBH.setId(1L);
+		cidadeResponseBH.setNome("Belo Horizonte");
+		cidadeResponseBH.setEstado(estadoResponseMG);
+
+		cidadeResponseRJ = new CidadeResponse();
+		cidadeResponseRJ.setId(2L);
+		cidadeResponseRJ.setNome("Rio de Janeiro");
+		cidadeResponseRJ.setEstado(estadoResponseRJ);
+		
+		cidadeResponseVR = new CidadeResponse();
+		cidadeResponseVR.setId(1L);
+		cidadeResponseVR.setNome("Volta Redonda");
+		cidadeResponseVR.setEstado(estadoResponseRJ);		
 	}
 }

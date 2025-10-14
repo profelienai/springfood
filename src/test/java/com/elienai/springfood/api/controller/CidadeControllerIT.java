@@ -194,7 +194,7 @@ public class CidadeControllerIT {
 			.statusCode(HttpStatus.BAD_REQUEST.value())
 			.body("status", is(400))
 			.body("title", is("Dados inválidos"))
-			.body("detail", containsString("Um ou mais campos estão inválidos"))
+			.body("detail", is("Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente."))
 			
 			.body("objects", hasSize(1))
 			.body("objects[0].name", is("estado.id"))
