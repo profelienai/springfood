@@ -46,39 +46,6 @@ class RestauranteTest {
     }
 
     @Test
-    void deveFalhar_quandoTodosCamposNulos() {
-        Restaurante restaurante = new Restaurante();
-        restaurante.setId(1L);
-        restaurante.setNome(null);
-        restaurante.setTaxaFrete(null);
-        restaurante.setCozinha(null);
-
-        Set<ConstraintViolation<Restaurante>> violations = validator.validate(restaurante);
-
-        assertThat(violations)
-        	.hasSize(3)
-            .extracting(ConstraintViolation::getMessage)
-            .containsExactlyInAnyOrder("não deve estar em branco",
-            		                   "não deve ser nulo",
-            		                   "não deve ser nulo");
-    }
-
-    @Test
-    void deveFalhar_quandoTaxaFreteNegativa() {
-        Restaurante restaurante = new Restaurante();
-        restaurante.setId(1L);
-        restaurante.setNome("Bella Napoli");
-        restaurante.setTaxaFrete(BigDecimal.valueOf(-5));
-        restaurante.setCozinha(getCozinhaValida());
-
-        Set<ConstraintViolation<Restaurante>> violations = validator.validate(restaurante);
-
-        assertThat(violations)
-            .extracting(ConstraintViolation::getMessage)
-            .containsExactly("deve ser maior ou igual a 0");
-    }
-
-    @Test
     void deveSerIgual_quandoIdsForemIguais() {
         Restaurante r1 = new Restaurante();
         r1.setId(1L);

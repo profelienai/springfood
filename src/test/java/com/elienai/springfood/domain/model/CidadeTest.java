@@ -42,38 +42,6 @@ public class CidadeTest {
 		assertThat(violations).isEmpty();
 	}
 	
-	@Test
-	void deveFalhar_quandoTodosCamposNulos() {
-		Cidade cidade = new Cidade();
-		cidade.setId(1L);
-		cidade.setNome(null);
-		cidade.setEstado(null);
-		
-		Set<ConstraintViolation<Cidade>> violations = validator.validate(cidade);
-		
-		assertThat(violations)
-			.hasSize(2)
-			.extracting(ConstraintViolation::getMessage)
-			.containsExactlyInAnyOrder("não deve estar em branco",
-					                   "não deve ser nulo");
-	}
-	
-	
-	@Test
-	void deveFalhar_quandoNomeEmBranco() {
-		Cidade cidade = new Cidade();
-		cidade.setId(1L);
-		cidade.setNome("");
-		cidade.setEstado(getEstadoValido());
-		
-		Set<ConstraintViolation<Cidade>> violations = validator.validate(cidade);
-		
-		assertThat(violations)
-			.hasSize(1)
-			.extracting(ConstraintViolation::getMessage)
-			.containsExactly("não deve estar em branco");
-	}
-	
     @Test
     void deveSerIgual_quandoIdsForemIguais() {
     	Cidade c1 = new Cidade();

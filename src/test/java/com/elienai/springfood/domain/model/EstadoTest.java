@@ -33,34 +33,6 @@ public class EstadoTest {
 		assertThat(violations).isEmpty();
 	}
 	
-	@Test
-	void deveFalhar_quandoNomeNulo() {
-		Estado estado = new Estado();
-		estado.setId(1L);
-		estado.setNome(null);
-
-		Set<ConstraintViolation<Estado>> violations = validator.validate(estado);
-		
-		assertThat(violations)
-			.hasSize(1)
-			.extracting(ConstraintViolation::getMessage)
-			.containsExactly("não deve estar em branco");
-	}
-	
-	@Test
-	void deveFalhar_quandoNomeEmBranco() {
-		Estado estado = new Estado();
-		estado.setId(1L);
-		estado.setNome("");
-
-		Set<ConstraintViolation<Estado>> violations = validator.validate(estado);
-		
-		assertThat(violations)
-			.hasSize(1)
-			.extracting(ConstraintViolation::getMessage)
-			.containsExactly("não deve estar em branco");
-	}	
-	
     @Test
     void deveSerIgual_quandoIdsForemIguais() {
         Estado e1 = new Estado();

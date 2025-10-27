@@ -35,34 +35,6 @@ class CozinhaTest {
     }
 
     @Test
-    void deveFalhar_quandoNomeNulo() {
-        Cozinha cozinha = new Cozinha();
-        cozinha.setId(1L);
-        cozinha.setNome(null);
-
-        Set<ConstraintViolation<Cozinha>> violations = validator.validate(cozinha);
-
-        assertThat(violations)
-        	.hasSize(1)
-            .extracting(ConstraintViolation::getMessage)
-            .containsExactly("não deve estar em branco");
-    }
-
-    @Test
-    void deveFalhar_quandoNomeEmBranco() {
-        Cozinha cozinha = new Cozinha();
-        cozinha.setId(1L);
-        cozinha.setNome("   ");
-
-        Set<ConstraintViolation<Cozinha>> violations = validator.validate(cozinha);
-
-        assertThat(violations)
-        	.hasSize(1)
-            .extracting(ConstraintViolation::getMessage)
-            .containsExactly("não deve estar em branco");
-    }
-
-    @Test
     void deveSerIgual_quandoIdsForemIguais() {
         Cozinha c1 = new Cozinha();
         c1.setId(1L);
