@@ -1,11 +1,13 @@
 package com.elienai.springfood.domain.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
@@ -107,5 +109,43 @@ public class CadastroRestauranteServiceIT {
 		RestauranteNaoEncontradoException ex = assertThrows(RestauranteNaoEncontradoException.class, () -> cadastroRestaurante.excluir(99L));
 		
 		assertEquals("Não existe um cadastro de restaurante com código 99", ex.getMessage());
-	}	
+	}
+	
+	@Test
+	public void deveAtivarRestaurante() {
+		Long restauranteId = 2L;
+
+		assertFalse(cadastroRestaurante.buscarOuFalhar(restauranteId).getAtivo());
+		cadastroRestaurante.ativar(restauranteId);
+		assertTrue(cadastroRestaurante.buscarOuFalhar(restauranteId).getAtivo());
+	}
+	
+	@Test
+	public void deveInativarRestaurante() {
+		Long restauranteId = 1L;
+		
+		assertTrue(cadastroRestaurante.buscarOuFalhar(restauranteId).getAtivo());
+		cadastroRestaurante.inativar(restauranteId);
+		assertFalse(cadastroRestaurante.buscarOuFalhar(restauranteId).getAtivo());
+	}
+	
+	@Test
+	public void deveAtivarListaDeRestaurante() {
+		List<Long> restaurantes = List.of(1L, 2L);
+		
+		cadastroRestaurante.ativar(restaurantes);
+		
+		restaurantes.forEach(
+				restauranteId -> assertTrue(cadastroRestaurante.buscarOuFalhar(restauranteId).getAtivo()) );
+	}
+	
+	@Test
+	public void deveInativarListaDeRestaurante() {
+		List<Long> restaurantes = List.of(1L, 2L);
+		
+		cadastroRestaurante.inativar(restaurantes);
+		
+		restaurantes.forEach(
+				restauranteId -> assertFalse(cadastroRestaurante.buscarOuFalhar(restauranteId).getAtivo()) );
+	}		
 }

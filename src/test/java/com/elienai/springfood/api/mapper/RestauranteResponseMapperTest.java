@@ -37,13 +37,14 @@ public class RestauranteResponseMapperTest {
 		restaurante.setNome("Borbulha");
 		restaurante.setTaxaFrete(new BigDecimal(10.99d));
 		restaurante.setCozinha(cozinha);
+		restaurante.ativar();
 		
 		var restauranteResponse = mapper.toResponse(restaurante);
 		
 		assertThat(restauranteResponse)
 			.isNotNull()
-			.extracting(RestauranteResponse::getId, RestauranteResponse::getNome, RestauranteResponse::getTaxaFrete)
-			.containsExactly(1L, "Borbulha", new BigDecimal(10.99d));
+			.extracting(RestauranteResponse::getId, RestauranteResponse::getNome, RestauranteResponse::getTaxaFrete, RestauranteResponse::getAtivo)
+			.containsExactly(1L, "Borbulha", new BigDecimal(10.99d), Boolean.TRUE);
 		
 		assertThat(restauranteResponse.getCozinha())
 			.isNotNull()
@@ -57,11 +58,13 @@ public class RestauranteResponseMapperTest {
 		restauranteBorbulha.setId(1L);
 		restauranteBorbulha.setTaxaFrete(new BigDecimal(10.99d));
 		restauranteBorbulha.setNome("Borbulha");
+		restauranteBorbulha.ativar();
 		
 		var restauranteDiNapoli = new Restaurante();
 		restauranteDiNapoli.setId(2L);
 		restauranteDiNapoli.setTaxaFrete(new BigDecimal(12.99d));
 		restauranteDiNapoli.setNome("Di Napoli");
+		restauranteDiNapoli.inativar();
 		
 		var restaurante = List.of(restauranteBorbulha, restauranteDiNapoli);
 		
@@ -70,9 +73,9 @@ public class RestauranteResponseMapperTest {
 		assertThat(restaurantesResponse)
 			.isNotNull()
 			.hasSize(2)
-			.extracting(RestauranteResponse::getId, RestauranteResponse::getNome, RestauranteResponse::getTaxaFrete)
+			.extracting(RestauranteResponse::getId, RestauranteResponse::getNome, RestauranteResponse::getTaxaFrete, RestauranteResponse::getAtivo)
 			.containsExactlyInAnyOrder(
-				tuple(1L, "Borbulha", new BigDecimal(10.99d)),
-				tuple(2L, "Di Napoli", new BigDecimal(12.99d)));
+				tuple(1L, "Borbulha", new BigDecimal(10.99d), Boolean.TRUE),
+				tuple(2L, "Di Napoli", new BigDecimal(12.99d), Boolean.FALSE));
 	}
 }

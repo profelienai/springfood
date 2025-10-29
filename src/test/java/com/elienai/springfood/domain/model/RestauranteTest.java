@@ -67,4 +67,24 @@ class RestauranteTest {
 
         assertThat(r1).isNotEqualTo(r2);
     }
+    
+    @Test
+    void deveAtivarRestaurante_quandoChamarMetodoAtivar() {
+        Restaurante restaurante = new Restaurante();
+        restaurante.setAtivo(false);
+
+        restaurante.ativar();
+
+        assertThat(restaurante.getAtivo()).isTrue();
+    }
+
+    @Test
+    void deveInativarRestaurante_quandoChamarMetodoInativar() {
+        Restaurante restaurante = new Restaurante();
+        restaurante.setAtivo(true);
+
+        restaurante.inativar();
+
+        assertThat(restaurante.getAtivo()).isFalse();
+    }    
 }

@@ -154,6 +154,56 @@ public class RestauranteControllerIT {
 	}	
 
 	@Test
+	public void deveRetornarStatus204_QuandoAtivarRestauranteExistente() {
+		given()
+			.pathParam("restauranteId", 2L)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/{restauranteId}/ativo")
+		.then()
+			.statusCode(HttpStatus.NO_CONTENT.value())
+			.body(is(emptyOrNullString()));
+	}	
+	
+	@Test
+	public void deveRetornarStatus204_QuandoInativarRestauranteExistente() {
+		given()
+			.pathParam("restauranteId", 1L)
+			.accept(ContentType.JSON)
+		.when()
+			.delete("/{restauranteId}/ativo")
+		.then()
+			.statusCode(HttpStatus.NO_CONTENT.value())
+			.body(is(emptyOrNullString()));
+	}		
+	
+	@Test
+	public void deveRetornarStatus204_QuandoAtivarMultiplosRestaurantesExistentes() {
+		given()
+			.body("[1, 2]")
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/ativacoes")
+		.then()
+			.statusCode(HttpStatus.NO_CONTENT.value())
+			.body(is(emptyOrNullString()));
+	}	
+	
+	@Test
+	public void deveRetornarStatus204_QuandoInativarMultiplosRestaurantesExistentes() {
+		given()
+			.body("[1, 2]")
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.delete("/ativacoes")
+		.then()
+			.statusCode(HttpStatus.NO_CONTENT.value())
+			.body(is(emptyOrNullString()));
+	}			
+	
+	@Test
 	public void deveRetornarStatus404_QuandoConsultarRestauranteInexistente() {
 		given()
 			.pathParam("restauranteId", 99L)
@@ -343,4 +393,70 @@ public class RestauranteControllerIT {
 			.body("detail", is("Não existe um cadastro de restaurante com código 99"))
 			.body("userMessage", is("Não existe um cadastro de restaurante com código 99"));		
 	}
+	
+	@Test
+	public void deveRetornarStatus404_QuandoAtivarRestauranteInexistente() {
+		given()
+			.pathParam("restauranteId", 99L)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/{restauranteId}/ativo")
+		.then()
+			.statusCode(HttpStatus.NOT_FOUND.value())
+			.body("status", is(404))
+			.body("type",  is("https://springfood.com.br/recurso-nao-encontrado"))
+			.body("title", is("Recurso não encontrado"))
+			.body("detail", is("Não existe um cadastro de restaurante com código 99"))
+			.body("userMessage", is("Não existe um cadastro de restaurante com código 99"));	
+	}	
+	
+	@Test
+	public void deveRetornarStatus404_QuandoInativarRestauranteInexistente() {
+		given()
+			.pathParam("restauranteId", 99L)
+			.accept(ContentType.JSON)
+		.when()
+			.delete("/{restauranteId}/ativo")
+		.then()
+			.statusCode(HttpStatus.NOT_FOUND.value())
+			.body("status", is(404))
+			.body("type",  is("https://springfood.com.br/recurso-nao-encontrado"))
+			.body("title", is("Recurso não encontrado"))
+			.body("detail", is("Não existe um cadastro de restaurante com código 99"))
+			.body("userMessage", is("Não existe um cadastro de restaurante com código 99"));		
+	}	
+	
+	@Test
+	public void deveRetornarStatus400_QuandoAtivarMultiplosRestaurantesComInexistente() {
+		given()
+			.body("[1, 2, 99]")
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/ativacoes")
+		.then()
+			.statusCode(HttpStatus.BAD_REQUEST.value())
+			.body("status", is(400))
+			.body("type",  is("https://springfood.com.br/erro-negocio"))
+			.body("title", is("Violação de regra de negócio"))
+			.body("detail", is("Não existe um cadastro de restaurante com código 99"))
+			.body("userMessage", is("Não existe um cadastro de restaurante com código 99"));	
+	}	
+	
+	@Test
+	public void deveRetornarStatus400_QuandoInativarMultiplosRestaurantesComInexistente() {
+		given()
+			.body("[1, 2, 99]")
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.delete("/ativacoes")
+		.then()
+			.statusCode(HttpStatus.BAD_REQUEST.value())
+			.body("status", is(400))
+			.body("type",  is("https://springfood.com.br/erro-negocio"))
+			.body("title", is("Violação de regra de negócio"))
+			.body("detail", is("Não existe um cadastro de restaurante com código 99"))
+			.body("userMessage", is("Não existe um cadastro de restaurante com código 99"));		
+	}		
 }
