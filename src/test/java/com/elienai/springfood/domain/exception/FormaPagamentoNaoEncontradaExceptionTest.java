@@ -8,7 +8,7 @@ public class FormaPagamentoNaoEncontradaExceptionTest {
 	@Test
 	void testFormaPagamentoNaoEncontradaException_comMensagem() {
 		FormaPagamentoNaoEncontradaException ex = new FormaPagamentoNaoEncontradaException("Forma de pagamento não encontrada");
-		assertEquals("Forma pagamento não encontrada", ex.getMessage());
+		assertEquals("Forma de pagamento não encontrada", ex.getMessage());
 	}
 
 	@Test

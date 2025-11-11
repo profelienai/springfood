@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
 import com.elienai.springfood.api.dto.CozinhaResponse;
+import com.elienai.springfood.core.modelmapper.ModelMapperConfig;
 import com.elienai.springfood.domain.model.Cozinha;
 
 public class CozinhaResponseMapperTest {
@@ -19,7 +20,7 @@ public class CozinhaResponseMapperTest {
 	
 	@BeforeEach
 	void setUp() {
-		modelMapper = new ModelMapper();
+		modelMapper = new ModelMapperConfig().modelMapper();
 		mapper = new CozinhaResponseMapper(modelMapper);
 	}
 	

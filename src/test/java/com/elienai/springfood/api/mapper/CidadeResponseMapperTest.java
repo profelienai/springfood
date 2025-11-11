@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 
 import com.elienai.springfood.api.dto.CidadeResponse;
 import com.elienai.springfood.api.dto.EstadoResponse;
+import com.elienai.springfood.core.modelmapper.ModelMapperConfig;
 import com.elienai.springfood.domain.model.Cidade;
 import com.elienai.springfood.domain.model.Estado;
 
@@ -21,7 +22,7 @@ public class CidadeResponseMapperTest {
 	
 	@BeforeEach
 	void setUp() {
-		modelMapper = new ModelMapper();
+		modelMapper = new ModelMapperConfig().modelMapper();
 		mapper = new CidadeResponseMapper(modelMapper);
 	}
 	

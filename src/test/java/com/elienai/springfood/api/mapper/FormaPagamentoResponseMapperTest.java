@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
 import com.elienai.springfood.api.dto.FormaPagamentoResponse;
+import com.elienai.springfood.core.modelmapper.ModelMapperConfig;
 import com.elienai.springfood.domain.model.FormaPagamento;
 
 public class FormaPagamentoResponseMapperTest {
@@ -19,7 +20,7 @@ public class FormaPagamentoResponseMapperTest {
 	
 	@BeforeEach
 	void setUp() {
-		modelMapper = new ModelMapper();
+		modelMapper = new ModelMapperConfig().modelMapper();
 		mapper = new FormaPagamentoResponseMapper(modelMapper);
 	}
 	

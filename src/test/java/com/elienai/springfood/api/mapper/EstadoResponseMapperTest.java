@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
 import com.elienai.springfood.api.dto.EstadoResponse;
+import com.elienai.springfood.core.modelmapper.ModelMapperConfig;
 import com.elienai.springfood.domain.model.Estado;
 
 public class EstadoResponseMapperTest {
@@ -19,7 +20,7 @@ public class EstadoResponseMapperTest {
 	
 	@BeforeEach
 	void setUp() {
-		modelMapper = new ModelMapper();
+		modelMapper = new ModelMapperConfig().modelMapper();
 		mapper = new EstadoResponseMapper(modelMapper);
 	}
 	
