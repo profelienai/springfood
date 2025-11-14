@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.elienai.springfood.domain.exception.EntidadeEmUsoException;
 import com.elienai.springfood.domain.exception.RestauranteNaoEncontradoException;
+import com.elienai.springfood.domain.model.Cidade;
 import com.elienai.springfood.domain.model.Cozinha;
 import com.elienai.springfood.domain.model.Restaurante;
 import com.elienai.springfood.domain.repository.RestauranteRepository;
@@ -24,14 +25,20 @@ public class CadastroRestauranteService {
 	
 	@Autowired
 	private CadastroCozinhaService cadastroCozinha;
+
+	@Autowired
+	private CadastroCidadeService cadastroCidade;	
 	
 	@Transactional
 	public Restaurante salvar(Restaurante restaurante) {
 		Long cozinhaId = restaurante.getCozinha().getId();
+		Long cidadeId = restaurante.getEndereco().getCidade().getId();
 		
 		Cozinha cozinha = cadastroCozinha.buscarOuFalhar(cozinhaId);
+		Cidade cidade = cadastroCidade.buscarOuFalhar(cidadeId);
 		
 		restaurante.setCozinha(cozinha);
+		restaurante.getEndereco().setCidade(cidade);
 		
 		return restauranteRepository.save(restaurante);
 	}

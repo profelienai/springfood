@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +42,8 @@ public class RestauranteControllerIT {
 	private String jsonRestauranteComIdCozinhaNulo;
 	private String jsonRestauranteComCozinhaInexistente;
 	private String jsonRestauranteComAtributoInexistente;
+	private String jsonRestauranteComIdCidadeNulo;
+	private String jsonRestauranteComCidadeInexistente;	
 	
 	@BeforeEach
 	private void setUp() {
@@ -61,7 +64,14 @@ public class RestauranteControllerIT {
 				"/json/incorreto/restaurante-com-cozinha-inexistente.json");
 		
 		jsonRestauranteComAtributoInexistente = ResourceUtils.getContentFromResource(
-				"/json/incorreto/restaurante-com-atributo-inexistente.json");		
+				"/json/incorreto/restaurante-com-atributo-inexistente.json");
+		
+		jsonRestauranteComIdCidadeNulo = ResourceUtils.getContentFromResource(
+				"/json/incorreto/restaurante-com-id-cidade-nulo.json");	
+		
+		jsonRestauranteComCidadeInexistente = ResourceUtils.getContentFromResource(
+				"/json/incorreto/restaurante-com-cidade-inexistente.json");
+		
 		
 	}
 	
@@ -99,7 +109,17 @@ public class RestauranteControllerIT {
 			.body("taxaFrete", is(10.5f))
 			
 			.body("cozinha.id", is(2))
-			.body("cozinha.nome", is("Arabe"));
+			.body("cozinha.nome", is("Arabe"))
+
+			.body("ativo", is(true))
+			
+			.body("endereco.cep", is("38400-999"))
+			.body("endereco.logradouro", is("Rua João Pinheiro"))
+			.body("endereco.numero", is("1000"))
+			.body("endereco.complemento", nullValue())
+			.body("endereco.bairro", is("Centro"))
+			.body("endereco.cidade", is("Campo Grande"))
+			.body("endereco.estado", is("Rio de Janeiro"));
 	}	
 	
 	@Test
@@ -118,7 +138,17 @@ public class RestauranteControllerIT {
 			.body("taxaFrete", is(10.99f))
 			
 			.body("cozinha.id", is(1))
-			.body("cozinha.nome", is("Italiana"));
+			.body("cozinha.nome", is("Italiana"))
+			
+			.body("ativo", is(true))
+			
+			.body("endereco.cep", is("38400-999"))
+			.body("endereco.logradouro", is("Rua Afonso Pena"))
+			.body("endereco.numero", is("1500"))
+			.body("endereco.complemento", nullValue())
+			.body("endereco.bairro", is("Centro"))
+			.body("endereco.cidade", is("Campo Grande"))
+			.body("endereco.estado", is("Rio de Janeiro"));	
 	}
 	
 	@Test
@@ -138,7 +168,17 @@ public class RestauranteControllerIT {
 			.body("taxaFrete", is(10.99f))
 			
 			.body("cozinha.id", is(1))
-			.body("cozinha.nome", is("Italiana"));
+			.body("cozinha.nome", is("Italiana"))
+			
+			.body("ativo", is(true))
+			
+			.body("endereco.cep", is("38400-999"))
+			.body("endereco.logradouro", is("Rua Afonso Pena"))
+			.body("endereco.numero", is("1500"))
+			.body("endereco.complemento", nullValue())
+			.body("endereco.bairro", is("Centro"))
+			.body("endereco.cidade", is("Campo Grande"))
+			.body("endereco.estado", is("Rio de Janeiro"));
 	}	
 
 	@Test
@@ -233,7 +273,7 @@ public class RestauranteControllerIT {
 			.body("title", is("Dados inválidos"))
 			.body("detail", containsString("Um ou mais campos estão inválidos"))
 
-			.body("objects", hasSize(3))
+			.body("objects", hasSize(4))
 			
 			.body("objects.name", hasItem("nome"))
 			.body("objects.userMessage", hasItem("Nome do restaurante é obrigatório"))		
@@ -243,6 +283,9 @@ public class RestauranteControllerIT {
 			
 			.body("objects.name", hasItem("taxaFrete"))
 			.body("objects.userMessage", hasItem("Taxa de frete do restaurante é obrigatória"))
+			
+			.body("objects.name", hasItem("endereco"))
+			.body("objects.userMessage", hasItem("Endereco do restaurante é obrigatório"))			
 			;		
 			
 	}	
@@ -280,7 +323,41 @@ public class RestauranteControllerIT {
 			.body("title", is("Violação de regra de negócio"))
 			.body("detail", is("Não existe um cadastro de cozinha com código 99"))
 			.body("userMessage", is("Não existe um cadastro de cozinha com código 99"));
+	}	
 
+	@Test
+	public void deveRetornarStatus400_QuandoAdicionarRestauranteComCidadeInvalida() {
+		given()
+			.body(jsonRestauranteComIdCidadeNulo)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.post()
+		.then()
+			.statusCode(HttpStatus.BAD_REQUEST.value())
+			.body("status", is(400))
+			.body("title", is("Dados inválidos"))
+			.body("detail", containsString("Um ou mais campos estão inválidos"))
+			
+			.body("objects", hasSize(1))
+			.body("objects[0].name", is("endereco.cidade.id"))
+			.body("objects[0].userMessage", is("Código da cidade é obrigatório"));		
+	}
+	
+	@Test
+	public void deveRetornarStatus400_QuandoAdicionarRestauranteComCidadeInexistente() {
+		given()
+			.body(jsonRestauranteComCidadeInexistente)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.post()
+		.then()
+			.statusCode(HttpStatus.BAD_REQUEST.value())
+			.body("status", is(400))
+			.body("title", is("Violação de regra de negócio"))
+			.body("detail", is("Não existe um cadastro de cidade com código 99"))
+			.body("userMessage", is("Não existe um cadastro de cidade com código 99"));
 	}	
 	
 	@Test
@@ -314,7 +391,7 @@ public class RestauranteControllerIT {
 			.body("title", is("Dados inválidos"))
 			.body("detail", containsString("Um ou mais campos estão inválidos"))
 			
-			.body("objects", hasSize(3))
+			.body("objects", hasSize(4))
 			
 			.body("objects.name", hasItem("nome"))
 			.body("objects.userMessage", hasItem("Nome do restaurante é obrigatório"))		
@@ -323,7 +400,10 @@ public class RestauranteControllerIT {
 			.body("objects.userMessage", hasItem("Cozinha do restaurante é obrigatória"))
 			
 			.body("objects.name", hasItem("taxaFrete"))
-			.body("objects.userMessage", hasItem("Taxa de frete do restaurante é obrigatória"));
+			.body("objects.userMessage", hasItem("Taxa de frete do restaurante é obrigatória"))
+			
+			.body("objects.name", hasItem("endereco"))
+			.body("objects.userMessage", hasItem("Endereco do restaurante é obrigatório"));
 	}		
 	
 	@Test

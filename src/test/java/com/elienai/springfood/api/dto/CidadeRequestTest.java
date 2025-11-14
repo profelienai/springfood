@@ -94,7 +94,12 @@ public class CidadeRequestTest {
 	 	
 	 	assertThat(violations)
 	 		.hasSize(2)
+	    	.extracting(v -> v.getPropertyPath().toString())
+	    	.contains("nome", "estado");
+
+	 	assertThat(violations)
 	 		.extracting(ConstraintViolation::getMessage)
 	 		.contains("não deve estar em branco", "não deve ser nulo");
+	 	
 	}	
 }

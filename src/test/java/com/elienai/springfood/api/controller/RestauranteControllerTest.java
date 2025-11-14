@@ -26,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.elienai.springfood.api.dto.CozinhaResponse;
+import com.elienai.springfood.api.dto.EnderecoResponse;
 import com.elienai.springfood.api.dto.RestauranteRequest;
 import com.elienai.springfood.api.dto.RestauranteResponse;
 import com.elienai.springfood.api.mapper.RestauranteRequestMapper;
@@ -84,13 +85,29 @@ public class RestauranteControllerTest {
 			   .andExpect(status().isOk())
 			   .andExpect(jsonPath("$", hasSize(2)))
 			   
-			   .andExpect(jsonPath("$[0].nome", is("Angelo")))
-			   .andExpect(jsonPath("$[0].taxaFrete", is(new BigDecimal(7.99))))
-			   .andExpect(jsonPath("$[0].cozinha.nome", is("Italiana")))
+			    .andExpect(jsonPath("$[0].nome", is("Angelo")))
+			    .andExpect(jsonPath("$[0].taxaFrete", is(new BigDecimal(7.99))))
+			    .andExpect(jsonPath("$[0].cozinha.nome", is("Italiana")))
+				.andExpect(jsonPath("$[0].ativo", is(Boolean.TRUE)))
+				.andExpect(jsonPath("$[0].endereco.cep", is("38400-999")))
+				.andExpect(jsonPath("$[0].endereco.logradouro", is("Rua João Pinheiro")))
+				.andExpect(jsonPath("$[0].endereco.numero", is("1000")))
+				.andExpect(jsonPath("$[0].endereco.complemento", is("C1")))
+				.andExpect(jsonPath("$[0].endereco.bairro", is("Centro")))
+				.andExpect(jsonPath("$[0].endereco.cidade", is("Pindamonhangaba")))
+				.andExpect(jsonPath("$[0].endereco.estado", is("São Paulo")))			   
 			   
-			   .andExpect(jsonPath("$[1].nome", is("Bocado")))
-			   .andExpect(jsonPath("$[1].taxaFrete", is(new BigDecimal(8.99))))		   
-			   .andExpect(jsonPath("$[1].cozinha.nome", is("Brasileira")));
+			    .andExpect(jsonPath("$[1].nome", is("Bocado")))
+			    .andExpect(jsonPath("$[1].taxaFrete", is(new BigDecimal(8.99))))		   
+			    .andExpect(jsonPath("$[1].cozinha.nome", is("Brasileira")))
+			    .andExpect(jsonPath("$[1].ativo", is(Boolean.TRUE)))
+				.andExpect(jsonPath("$[1].endereco.cep", is("38400-999")))
+				.andExpect(jsonPath("$[1].endereco.logradouro", is("Rua João Pinheiro")))
+				.andExpect(jsonPath("$[1].endereco.numero", is("1000")))
+				.andExpect(jsonPath("$[1].endereco.complemento", is("C1")))
+				.andExpect(jsonPath("$[1].endereco.bairro", is("Centro")))
+				.andExpect(jsonPath("$[1].endereco.cidade", is("Pindamonhangaba")))
+				.andExpect(jsonPath("$[1].endereco.estado", is("São Paulo")));				   
 	}
 	
 	@Test
@@ -103,7 +120,15 @@ public class RestauranteControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.nome", is("Bocado")))
 			.andExpect(jsonPath("$.taxaFrete", is(new BigDecimal(8.99))))		   
-			.andExpect(jsonPath("$.cozinha.nome", is("Brasileira")));
+			.andExpect(jsonPath("$.cozinha.nome", is("Brasileira")))
+			.andExpect(jsonPath("$.ativo", is(Boolean.TRUE)))
+			.andExpect(jsonPath("$.endereco.cep", is("38400-999")))
+			.andExpect(jsonPath("$.endereco.logradouro", is("Rua João Pinheiro")))
+			.andExpect(jsonPath("$.endereco.numero", is("1000")))
+			.andExpect(jsonPath("$.endereco.complemento", is("C1")))
+			.andExpect(jsonPath("$.endereco.bairro", is("Centro")))
+			.andExpect(jsonPath("$.endereco.cidade", is("Pindamonhangaba")))
+			.andExpect(jsonPath("$.endereco.estado", is("São Paulo")));					
 	}
 	
 	@Test
@@ -119,7 +144,15 @@ public class RestauranteControllerTest {
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("$.nome", is("Cadore")))
 			.andExpect(jsonPath("$.taxaFrete", is(new BigDecimal(10.99))))		   
-			.andExpect(jsonPath("$.cozinha.nome", is("Italiana")));
+			.andExpect(jsonPath("$.cozinha.nome", is("Italiana")))
+			.andExpect(jsonPath("$.ativo", is(Boolean.TRUE)))
+			.andExpect(jsonPath("$.endereco.cep", is("38400-999")))
+			.andExpect(jsonPath("$.endereco.logradouro", is("Rua João Pinheiro")))
+			.andExpect(jsonPath("$.endereco.numero", is("1000")))
+			.andExpect(jsonPath("$.endereco.complemento", is("C1")))
+			.andExpect(jsonPath("$.endereco.bairro", is("Centro")))
+			.andExpect(jsonPath("$.endereco.cidade", is("Pindamonhangaba")))
+			.andExpect(jsonPath("$.endereco.estado", is("São Paulo")));				
 	}
 	
 	@Test
@@ -136,7 +169,15 @@ public class RestauranteControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.nome", is("Cadore")))
 			.andExpect(jsonPath("$.taxaFrete", is(new BigDecimal(10.99))))		   
-			.andExpect(jsonPath("$.cozinha.nome", is("Italiana")));
+			.andExpect(jsonPath("$.cozinha.nome", is("Italiana")))
+			.andExpect(jsonPath("$.ativo", is(Boolean.TRUE)))
+			.andExpect(jsonPath("$.endereco.cep", is("38400-999")))
+			.andExpect(jsonPath("$.endereco.logradouro", is("Rua João Pinheiro")))
+			.andExpect(jsonPath("$.endereco.numero", is("1000")))
+			.andExpect(jsonPath("$.endereco.complemento", is("C1")))
+			.andExpect(jsonPath("$.endereco.bairro", is("Centro")))
+			.andExpect(jsonPath("$.endereco.cidade", is("Pindamonhangaba")))
+			.andExpect(jsonPath("$.endereco.estado", is("São Paulo")));				
 	}
 	
 	@Test
@@ -174,6 +215,14 @@ public class RestauranteControllerTest {
 		restauranteC.setTaxaFrete(new BigDecimal(10.99));
 		restauranteC.setCozinha(cozinhaItaliana);
 		
+		EnderecoResponse endereco = new EnderecoResponse();
+        endereco.setCep("38400-999");
+        endereco.setLogradouro("Rua João Pinheiro");
+        endereco.setNumero("1000");
+        endereco.setComplemento("C1");
+        endereco.setBairro("Centro");
+        endereco.setCidade("Pindamonhangaba");		
+        endereco.setEstado("São Paulo");
 		
 		CozinhaResponse cozinhaResponseItaliana = new CozinhaResponse();
 		cozinhaResponseItaliana.setId(1L);
@@ -188,18 +237,24 @@ public class RestauranteControllerTest {
 		restauranteResponseA.setNome("Angelo");
 		restauranteResponseA.setTaxaFrete(new BigDecimal(7.99));
 		restauranteResponseA.setCozinha(cozinhaResponseItaliana);
-
+		restauranteResponseA.setAtivo(true);
+		restauranteResponseA.setEndereco(endereco);
+		
 		restauranteResponseB = new RestauranteResponse();
 		restauranteResponseB.setId(2L);
 		restauranteResponseB.setNome("Bocado");
 		restauranteResponseB.setTaxaFrete(new BigDecimal(8.99));
 		restauranteResponseB.setCozinha(cozinhaResponseBrasileira);
+		restauranteResponseB.setAtivo(true);
+		restauranteResponseB.setEndereco(endereco);
 		
 		restauranteResponseC = new RestauranteResponse();
 		restauranteResponseC.setId(1L);
 		restauranteResponseC.setNome("Cadore");
 		restauranteResponseC.setTaxaFrete(new BigDecimal(10.99));
-		restauranteResponseC.setCozinha(cozinhaResponseItaliana);		
+		restauranteResponseC.setCozinha(cozinhaResponseItaliana);	
+		restauranteResponseC.setAtivo(true);
+		restauranteResponseC.setEndereco(endereco);
 		
 	}
 }

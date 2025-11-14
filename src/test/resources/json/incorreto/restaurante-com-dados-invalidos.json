@@ -1,5 +1,6 @@
 {
     "nome": null,
     "taxaFrete": null,
-    "cozinha": null
+    "cozinha": null,
+    "endereco": null
 }

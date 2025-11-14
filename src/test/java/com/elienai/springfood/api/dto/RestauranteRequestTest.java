@@ -13,23 +13,38 @@ import org.junit.jupiter.api.Test;
 
 public class RestauranteRequestTest {
 
+	private static EnderecoRequest endereco;
+	private static CozinhaIdRequest cozinha;
+	
 	private static Validator validator;
 	
 	@BeforeAll
 	static void setUp() {
 		var factory = Validation.buildDefaultValidatorFactory();
 		validator = factory.getValidator();
+	
+        var cidade = new CidadeIdRequest();
+        cidade.setId(1L);
+
+        endereco = new EnderecoRequest();
+        endereco.setCep("38400-999");
+        endereco.setLogradouro("Rua João Pinheiro");
+        endereco.setNumero("1000");
+        endereco.setComplemento("C1");
+        endereco.setBairro("Centro");
+        endereco.setCidade(cidade);
+        
+        cozinha = new CozinhaIdRequest();
+        cozinha.setId(1L);		
 	}
 	
 	@Test
 	void deveSerValido_quandoTodosCamposPreenchidos() {
-		var cozinhaIdRequest = new CozinhaIdRequest();
-		cozinhaIdRequest.setId(1L);
-		
 		var restauranteRequest = new RestauranteRequest();
 		restauranteRequest.setNome("Di Napoli");
 		restauranteRequest.setTaxaFrete(new BigDecimal(10.99d));
-		restauranteRequest.setCozinha(cozinhaIdRequest);
+		restauranteRequest.setCozinha(cozinha);
+		restauranteRequest.setEndereco(endereco);
 		
 	 	var violations =  validator.validate(restauranteRequest);
 	 	
@@ -37,58 +52,44 @@ public class RestauranteRequestTest {
 	}
 
 	@Test
-	void deveFalhar_quandoNomeNulo() {
-		var cozinhaIdRequest = new CozinhaIdRequest();
-		cozinhaIdRequest.setId(1L);
-		
+	void deveFalhar_quandoCamposObrigatoriosNulos() {
 		var restauranteRequest = new RestauranteRequest();
 		restauranteRequest.setNome(null);
-		restauranteRequest.setTaxaFrete(new BigDecimal(10.99d));
-		restauranteRequest.setCozinha(cozinhaIdRequest);
+		restauranteRequest.setTaxaFrete(null);
+		restauranteRequest.setCozinha(null);
+		restauranteRequest.setEndereco(null);
 		
 		var violations =  validator.validate(restauranteRequest);
 	 	
-	 	assertThat(violations)
-	 		.hasSize(1)
-	 		.extracting(ConstraintViolation::getMessage)
-	 		.containsExactly("não deve estar em branco");
-	}
-	
-	@Test
-	void deveFalhar_quandoNomeEmBranco() {
-		var cozinhaIdRequest = new CozinhaIdRequest();
-		cozinhaIdRequest.setId(1L);
+	    assertThat(violations)
+	    	.hasSize(4)
+	    	.extracting(v -> v.getPropertyPath().toString())
+	    	.contains("nome", "taxaFrete", "cozinha", "endereco");		
 		
-		var restauranteRequest = new RestauranteRequest();
-		restauranteRequest.setNome("");
-		restauranteRequest.setTaxaFrete(new BigDecimal(10.99d));
-		restauranteRequest.setCozinha(cozinhaIdRequest);
-		
-		var violations =  validator.validate(restauranteRequest);
-	 	
 	 	assertThat(violations)
-	 		.hasSize(1)
 	 		.extracting(ConstraintViolation::getMessage)
-	 		.contains("não deve estar em branco");
+	 		.contains("não deve estar em branco", "não deve ser nulo", "não deve ser nulo");
 	}	
 	
 	@Test
-	void deveFalhar_quandoTaxaFreteNulo() {
-		var cozinhaIdRequest = new CozinhaIdRequest();
-		cozinhaIdRequest.setId(1L);
-		
+	void deveFalhar_quandoNomeEmBranco() {
 		var restauranteRequest = new RestauranteRequest();
-		restauranteRequest.setNome("Di Napoli");
-		restauranteRequest.setTaxaFrete(null);
-		restauranteRequest.setCozinha(cozinhaIdRequest);
+		restauranteRequest.setNome("");
+		restauranteRequest.setTaxaFrete(new BigDecimal(10.99d));
+		restauranteRequest.setCozinha(cozinha);
+		restauranteRequest.setEndereco(endereco);
 		
 		var violations =  validator.validate(restauranteRequest);
 	 	
+	    assertThat(violations)
+    		.hasSize(1)
+    		.extracting(v -> v.getPropertyPath().toString())
+    		.contains("nome");				
+		
 	 	assertThat(violations)
-	 		.hasSize(1)
 	 		.extracting(ConstraintViolation::getMessage)
-	 		.containsExactly("não deve ser nulo");
-	}
+	 		.contains("não deve estar em branco");
+	}	
 	
 	@Test
 	void deveFalhar_quandoTaxaFreteNegativo() {
@@ -98,43 +99,18 @@ public class RestauranteRequestTest {
 		var restauranteRequest = new RestauranteRequest();
 		restauranteRequest.setNome("Di Napoli");
 		restauranteRequest.setTaxaFrete(new BigDecimal(-10.99d));
-		restauranteRequest.setCozinha(cozinhaIdRequest);
+		restauranteRequest.setCozinha(cozinha);
+		restauranteRequest.setEndereco(endereco);
 		
 		var violations =  validator.validate(restauranteRequest);
 	 	
+	    assertThat(violations)
+			.hasSize(1)
+			.extracting(v -> v.getPropertyPath().toString())
+			.contains("taxaFrete");		
+		
 	 	assertThat(violations)
-	 		.hasSize(1)
 	 		.extracting(ConstraintViolation::getMessage)
 	 		.containsExactly("deve ser maior ou igual a 0");
-	}		
-	
-	@Test
-	void deveFalhar_quandoCozinhaNulo() {
-		var restauranteRequest = new RestauranteRequest();
-		restauranteRequest.setNome("Di Napoli");
-		restauranteRequest.setTaxaFrete(new BigDecimal(10.99d));
-		restauranteRequest.setCozinha(null);
-		
-		var violations =  validator.validate(restauranteRequest);
-	 	
-	 	assertThat(violations)
-	 		.hasSize(1)
-	 		.extracting(ConstraintViolation::getMessage)
-	 		.containsExactly("não deve ser nulo");
-	}	
-	
-	@Test
-	void deveFalhar_quandoTodosDadosNulos() {
-		var restauranteRequest = new RestauranteRequest();
-		restauranteRequest.setNome(null);
-		restauranteRequest.setTaxaFrete(null);
-		restauranteRequest.setCozinha(null);
-		
-		var violations =  validator.validate(restauranteRequest);
-	 	
-	 	assertThat(violations)
-	 		.hasSize(3)
-	 		.extracting(ConstraintViolation::getMessage)
-	 		.contains("não deve estar em branco", "não deve ser nulo", "não deve ser nulo");
 	}	
 }

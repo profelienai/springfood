@@ -18,7 +18,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 
 import com.elienai.springfood.domain.exception.RestauranteNaoEncontradoException;
+import com.elienai.springfood.domain.model.Cidade;
 import com.elienai.springfood.domain.model.Cozinha;
+import com.elienai.springfood.domain.model.Endereco;
 import com.elienai.springfood.domain.model.Restaurante;
 import com.elienai.springfood.domain.repository.RestauranteRepository;
 import com.elienai.springfood.util.DatabaseCleaner;
@@ -67,6 +69,17 @@ public class CadastroRestauranteServiceIT {
 	
 	@Test
 	public void deveSalvarRestaurante() {
+        Cidade cidade = new Cidade();
+        cidade.setId(1L);
+
+        Endereco endereco = new Endereco();
+        endereco.setCep("38400-999");
+        endereco.setLogradouro("Rua João Pinheiro");
+        endereco.setNumero("1000");
+        endereco.setComplemento("C1");
+        endereco.setBairro("Centro");
+        endereco.setCidade(cidade);
+        
 		Cozinha cozinha = new Cozinha();
 		cozinha.setId(1L);
 		
@@ -74,6 +87,7 @@ public class CadastroRestauranteServiceIT {
 		restaurante.setNome("Brasador Steakhouse");
 		restaurante.setTaxaFrete(new BigDecimal(10.00d));
 		restaurante.setCozinha(cozinha);
+		restaurante.setEndereco(endereco);
 		
 		Restaurante restauranteSalvo = cadastroRestaurante.salvar(restaurante);
 

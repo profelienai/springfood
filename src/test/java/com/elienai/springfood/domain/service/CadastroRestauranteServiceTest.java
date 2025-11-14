@@ -26,10 +26,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 
+import com.elienai.springfood.domain.exception.CidadeNaoEncontradaException;
 import com.elienai.springfood.domain.exception.CozinhaNaoEncontradaException;
 import com.elienai.springfood.domain.exception.EntidadeEmUsoException;
 import com.elienai.springfood.domain.exception.EntidadeNaoEncontradaException;
+import com.elienai.springfood.domain.model.Cidade;
 import com.elienai.springfood.domain.model.Cozinha;
+import com.elienai.springfood.domain.model.Endereco;
 import com.elienai.springfood.domain.model.Restaurante;
 import com.elienai.springfood.domain.repository.RestauranteRepository;
 
@@ -44,13 +47,28 @@ public class CadastroRestauranteServiceTest {
 	
 	@Mock
 	private CadastroCozinhaService cadastroCozinha;
+
+	@Mock
+	private CadastroCidadeService cadastroCidade;	
 	
 	private Cozinha cozinha;
+	private Cidade cidade;
 	private Restaurante restaurante10;
 	private Restaurante restaurante20;
 	
 	@BeforeEach
 	void setUp() {
+        cidade = new Cidade();
+        cidade.setId(1L);
+
+        var endereco = new Endereco();
+        endereco.setCep("38400-999");
+        endereco.setLogradouro("Rua João Pinheiro");
+        endereco.setNumero("1000");
+        endereco.setComplemento("C1");
+        endereco.setBairro("Centro");
+        endereco.setCidade(cidade);		
+		
 		cozinha = new Cozinha();
 		cozinha.setId(1L);
 		
@@ -58,6 +76,7 @@ public class CadastroRestauranteServiceTest {
 		restaurante10.setId(10L);
 		restaurante10.setCozinha(cozinha);
 		restaurante10.setNome("NomeTeste");
+		restaurante10.setEndereco(endereco);
 		
 		restaurante20 = new Restaurante();
 		restaurante20.setId(20L);
@@ -66,14 +85,18 @@ public class CadastroRestauranteServiceTest {
 	@Test
 	void testSalvar_RestauranteComCozinhaExistente() {
 		when(cadastroCozinha.buscarOuFalhar(1L)).thenReturn(cozinha);
+		when(cadastroCidade.buscarOuFalhar(1L)).thenReturn(cidade);
 		when(restauranteRepository.save(restaurante10)).thenReturn(restaurante10);
 		
 		Restaurante restauranteSalvo = cadastroRestauranteService.salvar(restaurante10);
 		
 		assertNotNull(restauranteSalvo);
 		assertSame(restaurante10, restauranteSalvo);
+		assertSame(cozinha, restauranteSalvo.getCozinha());
+		assertSame(cidade, restauranteSalvo.getEndereco().getCidade());
 		
 		verify(cadastroCozinha).buscarOuFalhar(1L);
+		verify(cadastroCidade).buscarOuFalhar(1L);
 		verify(restauranteRepository).save(restaurante10);
 	}
 	
@@ -90,6 +113,18 @@ public class CadastroRestauranteServiceTest {
 	}
 	
 	@Test
+	void testSalvar_LancarExcecaoQuandoCidadeNaoExiste() {
+		when(cadastroCidade.buscarOuFalhar(1L)).thenThrow(new CidadeNaoEncontradaException(1L));
+		
+		EntidadeNaoEncontradaException ex = 
+				assertThrows(EntidadeNaoEncontradaException.class,() -> cadastroRestauranteService.salvar(restaurante10));
+		
+		assertEquals("Não existe um cadastro de cidade com código 1", ex.getMessage());
+		verify(cadastroCidade).buscarOuFalhar(1L);
+		verify(restauranteRepository, never()).save(any());
+	}	
+	
+	@Test
 	void testExcluir_ComSucesso() {
 		Long restauranteId = 10L;
 		
@@ -100,7 +135,7 @@ public class CadastroRestauranteServiceTest {
 	}
 	
 	@Test
-	void testExluir_LancarExcecaoQuandoRestauranteNaoExiste() {
+	void testExcluir_LancarExcecaoQuandoRestauranteNaoExiste() {
 		Long restauranteId = 999L;
 
 		doThrow(new EmptyResultDataAccessException(1)).when(restauranteRepository).deleteById(restauranteId);

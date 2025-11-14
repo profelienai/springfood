@@ -8,32 +8,50 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
+import com.elienai.springfood.api.dto.CidadeIdRequest;
 import com.elienai.springfood.api.dto.CozinhaIdRequest;
+import com.elienai.springfood.api.dto.EnderecoRequest;
 import com.elienai.springfood.api.dto.RestauranteRequest;
 import com.elienai.springfood.core.modelmapper.ModelMapperConfig;
+import com.elienai.springfood.domain.model.Cidade;
 import com.elienai.springfood.domain.model.Cozinha;
+import com.elienai.springfood.domain.model.Endereco;
 import com.elienai.springfood.domain.model.Restaurante;
 
 public class RestauranteRequestMapperTest {
 	private RestauranteRequestMapper mapper;
 	private ModelMapper modelMapper;
 	
+	private RestauranteRequest restauranteRequest;
+	
 	@BeforeEach
 	void setUp() {
 		modelMapper = new ModelMapperConfig().modelMapper();
 		mapper = new RestauranteRequestMapper(modelMapper);
+		
+        var cidade = new CidadeIdRequest();
+        cidade.setId(1L);
+
+        var enderecoRequest = new EnderecoRequest();
+        enderecoRequest.setCep("38400-999");
+        enderecoRequest.setLogradouro("Rua João Pinheiro");
+        enderecoRequest.setNumero("1000");
+        enderecoRequest.setComplemento("C1");
+        enderecoRequest.setBairro("Centro");
+        enderecoRequest.setCidade(cidade);		
+        
+		var cozinhaIdRequest = new CozinhaIdRequest();
+		cozinhaIdRequest.setId(10L);
+		
+		restauranteRequest = new RestauranteRequest();
+		restauranteRequest.setNome("Di Napoli");
+		restauranteRequest.setTaxaFrete(new BigDecimal(10.99d));
+		restauranteRequest.setCozinha(cozinhaIdRequest);
+		restauranteRequest.setEndereco(enderecoRequest);
 	}
 	
 	@Test
 	void deveConverterRestauranteRequestParaDominObject() {
-		var cozinhaIdRequest = new CozinhaIdRequest();
-		cozinhaIdRequest.setId(10L);
-
-		var restauranteRequest = new RestauranteRequest();
-		restauranteRequest.setNome("Di Napoli");
-		restauranteRequest.setTaxaFrete(new BigDecimal(10.99d));
-		restauranteRequest.setCozinha(cozinhaIdRequest);
-		
 		var restaurante = mapper.toDomainObject(restauranteRequest);
 		
         assertThat(restaurante)
@@ -44,30 +62,24 @@ public class RestauranteRequestMapperTest {
         assertThat(restaurante.getCozinha())
 	    	.isNotNull()
 	    	.extracting(Cozinha::getId, Cozinha::getNome)
-	    	.containsExactly(10L, null);        
+	    	.containsExactly(10L, null);       
+        
+        assertThat(restaurante.getEndereco())
+	    	.isNotNull()
+	    	.extracting(Endereco::getCep, Endereco::getLogradouro, Endereco::getNumero, 
+	    			    Endereco::getComplemento, Endereco::getBairro)
+	    	.containsExactly("38400-999", "Rua João Pinheiro", "1000", "C1", "Centro");
+        
+        assertThat(restaurante.getEndereco().getCidade())
+	    	.isNotNull()
+	    	.extracting(Cidade::getId)
+	    	.isEqualTo(1L);
 	}
 	
 	@Test
 	void deveCopiarPropriedadesDeRequestParaDomainExistente() {
-		var cozinhaIdRequest = new CozinhaIdRequest();
-		cozinhaIdRequest.setId(20L);
-		
-		var restauranteRequest = new RestauranteRequest();
-		restauranteRequest.setNome("Di Napoli");
-		restauranteRequest.setTaxaFrete(new BigDecimal(10.99d));
-		restauranteRequest.setCozinha(cozinhaIdRequest);
-		
-		
-		var cozinha = new Cozinha();
-		cozinha.setId(10L);
-		cozinha.setNome("Brasileira");
-		
 		var restaurante = new Restaurante();
 		restaurante.setId(1L);
-		restaurante.setNome("Borbulha");
-		restaurante.setTaxaFrete(new BigDecimal(12.99d));
-		restaurante.setCozinha(cozinha);
-		
 		
 		mapper.copyToDomainObject(restauranteRequest, restaurante);
 		
@@ -79,7 +91,18 @@ public class RestauranteRequestMapperTest {
         assertThat(restaurante.getCozinha())
 	    	.isNotNull()
 	    	.extracting(Cozinha::getId, Cozinha::getNome)
-	    	.containsExactly(20L, null);        
+	    	.containsExactly(10L, null); 
+        
+        assertThat(restaurante.getEndereco())
+	    	.isNotNull()
+	    	.extracting(Endereco::getCep, Endereco::getLogradouro, Endereco::getNumero, 
+	    			    Endereco::getComplemento, Endereco::getBairro)
+	    	.containsExactly("38400-999", "Rua João Pinheiro", "1000", "C1", "Centro");
+        
+        assertThat(restaurante.getEndereco().getCidade())
+	    	.isNotNull()
+	    	.extracting(Cidade::getId)
+	    	.isEqualTo(1L);        
         
 	}
 }

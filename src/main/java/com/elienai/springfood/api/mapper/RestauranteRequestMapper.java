@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import com.elienai.springfood.api.dto.RestauranteRequest;
+import com.elienai.springfood.domain.model.Cidade;
 import com.elienai.springfood.domain.model.Cozinha;
 import com.elienai.springfood.domain.model.Restaurante;
 
@@ -25,6 +26,10 @@ public class RestauranteRequestMapper {
 		// com.elienai.springfood.domain.model.Cozinha was altered from 1 to 2
 		restaurante.setCozinha(new Cozinha());
 			
+		if (restaurante.getEndereco() != null) {
+			restaurante.getEndereco().setCidade(new Cidade());
+		}
+		
 		modelMapper.map(restauranteRequest, restaurante);
 	}
 	
