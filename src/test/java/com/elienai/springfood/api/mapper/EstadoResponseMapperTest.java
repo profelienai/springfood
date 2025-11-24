@@ -40,7 +40,7 @@ public class EstadoResponseMapperTest {
 	}
 	
 	@Test
-	void deveConverterCollectionDeEstadoParaCollectiondeEstadoResponde() {
+	void deveConverterCollectionDeEstadoParaCollectionDeEstadoResponse() {
 		var estadoSP = new Estado();
 		estadoSP.setId(1L);
 		estadoSP.setNome("São Paulo");
@@ -51,9 +51,9 @@ public class EstadoResponseMapperTest {
 		
 		var estados = List.of(estadoSP, estadoRJ);
 		
-		var estadosResponde = mapper.toCollectionResponse(estados);
+		var estadosResponse = mapper.toCollectionResponse(estados);
 		
-		assertThat(estadosResponde)
+		assertThat(estadosResponse)
 			.isNotNull()
 			.hasSize(2)
 			.extracting(EstadoResponse::getId, EstadoResponse::getNome)
