@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -30,9 +31,11 @@ import com.elienai.springfood.domain.exception.CidadeNaoEncontradaException;
 import com.elienai.springfood.domain.exception.CozinhaNaoEncontradaException;
 import com.elienai.springfood.domain.exception.EntidadeEmUsoException;
 import com.elienai.springfood.domain.exception.EntidadeNaoEncontradaException;
+import com.elienai.springfood.domain.exception.FormaPagamentoNaoEncontradaException;
 import com.elienai.springfood.domain.model.Cidade;
 import com.elienai.springfood.domain.model.Cozinha;
 import com.elienai.springfood.domain.model.Endereco;
+import com.elienai.springfood.domain.model.FormaPagamento;
 import com.elienai.springfood.domain.model.Restaurante;
 import com.elienai.springfood.domain.repository.RestauranteRepository;
 
@@ -51,10 +54,14 @@ public class CadastroRestauranteServiceTest {
 	@Mock
 	private CadastroCidadeService cadastroCidade;	
 	
+	@Mock
+	private CadastroFormaPagamentoService cadastroFormaPagamento;
+	
 	private Cozinha cozinha;
 	private Cidade cidade;
 	private Restaurante restaurante10;
 	private Restaurante restaurante20;
+	private FormaPagamento formaPagamento;
 	
 	@BeforeEach
 	void setUp() {
@@ -80,6 +87,11 @@ public class CadastroRestauranteServiceTest {
 		
 		restaurante20 = new Restaurante();
 		restaurante20.setId(20L);
+		
+		formaPagamento = new FormaPagamento();
+		formaPagamento.setId(100L);
+
+		restaurante10.setFormasPagamento(new HashSet<>());		
 	}
 	
 	@Test
@@ -270,5 +282,107 @@ public class CadastroRestauranteServiceTest {
 		
 		verify(restauranteRepository).findById(10L);
 		verify(restauranteRepository).findById(20L);
-	}	
+	}
+	
+	@Test
+	void testAssociarFormaPagamento_ComSucesso() {
+	    Long restauranteId = 10L;
+	    Long formaPagamentoId = 100L;
+
+	    when(restauranteRepository.findById(restauranteId)).thenReturn(Optional.of(restaurante10));
+	    when(cadastroFormaPagamento.buscarOuFalhar(formaPagamentoId)).thenReturn(formaPagamento);
+
+	    assertDoesNotThrow(() -> cadastroRestauranteService.associarFormaPagamento(restauranteId, formaPagamentoId));
+
+	    assertTrue(restaurante10.getFormasPagamento().contains(formaPagamento));
+
+	    verify(restauranteRepository).findById(restauranteId);
+	    verify(cadastroFormaPagamento).buscarOuFalhar(formaPagamentoId);
+	}
+	
+	@Test
+	void testAssociarFormaPagamento_LancarExcecaoQuandoRestauranteNaoExiste() {
+	    Long restauranteId = 999L;
+	    Long formaPagamentoId = 100L;
+
+	    when(restauranteRepository.findById(restauranteId)).thenReturn(Optional.empty());
+
+	    EntidadeNaoEncontradaException ex =
+	        assertThrows(EntidadeNaoEncontradaException.class, 
+	            () -> cadastroRestauranteService.associarFormaPagamento(restauranteId, formaPagamentoId));
+
+	    assertEquals("Não existe um cadastro de restaurante com código 999", ex.getMessage());
+	    verify(restauranteRepository).findById(restauranteId);
+	}
+	
+	@Test
+	void testAssociarFormaPagamento_LancarExcecaoQuandoFormaPagamentoNaoExiste() {
+	    Long restauranteId = 10L;
+	    Long formaPagamentoId = 999L;
+
+	    when(restauranteRepository.findById(restauranteId)).thenReturn(Optional.of(restaurante10));
+	    when(cadastroFormaPagamento.buscarOuFalhar(formaPagamentoId))
+	        .thenThrow(new FormaPagamentoNaoEncontradaException(formaPagamentoId));
+
+	    EntidadeNaoEncontradaException ex =
+	    		assertThrows(EntidadeNaoEncontradaException.class, 
+	    				() -> cadastroRestauranteService.associarFormaPagamento(restauranteId, formaPagamentoId));
+
+	    assertEquals("Não existe um cadastro de forma de pagamento com código 999", ex.getMessage());
+	    verify(restauranteRepository).findById(restauranteId);
+	    verify(cadastroFormaPagamento).buscarOuFalhar(formaPagamentoId);
+	}
+	
+	@Test
+	void testDesassociarFormaPagamento_ComSucesso() {
+	    Long restauranteId = 10L;
+	    Long formaPagamentoId = 100L;
+
+	    restaurante10.getFormasPagamento().add(formaPagamento);
+
+	    when(restauranteRepository.findById(restauranteId)).thenReturn(Optional.of(restaurante10));
+	    when(cadastroFormaPagamento.buscarOuFalhar(formaPagamentoId)).thenReturn(formaPagamento);
+
+	    assertDoesNotThrow(() -> cadastroRestauranteService.desassociarFormaPagamento(restauranteId, formaPagamentoId));
+
+	    assertFalse(restaurante10.getFormasPagamento().contains(formaPagamento));
+
+	    verify(restauranteRepository).findById(restauranteId);
+	    verify(cadastroFormaPagamento).buscarOuFalhar(formaPagamentoId);
+	}
+
+	@Test
+	void testDesassociarFormaPagamento_LancarExcecaoQuandoRestauranteNaoExiste() {
+	    Long restauranteId = 999L;
+	    Long formaPagamentoId = 100L;
+
+	    when(restauranteRepository.findById(restauranteId)).thenReturn(Optional.empty());
+
+	    EntidadeNaoEncontradaException ex =
+	        assertThrows(EntidadeNaoEncontradaException.class,
+	            () -> cadastroRestauranteService.desassociarFormaPagamento(restauranteId, formaPagamentoId));
+
+	    assertEquals("Não existe um cadastro de restaurante com código 999", ex.getMessage());
+	    verify(restauranteRepository).findById(restauranteId);
+	}
+	
+	@Test
+	void testDesassociarFormaPagamento_LancarExcecaoQuandoFormaPagamentoNaoExiste() {
+	    Long restauranteId = 10L;
+	    Long formaPagamentoId = 999L;
+
+	    when(restauranteRepository.findById(restauranteId)).thenReturn(Optional.of(restaurante10));
+	    when(cadastroFormaPagamento.buscarOuFalhar(formaPagamentoId))
+	        .thenThrow(new FormaPagamentoNaoEncontradaException(formaPagamentoId));
+
+	    EntidadeNaoEncontradaException ex =
+	    		assertThrows(EntidadeNaoEncontradaException.class,
+	    				() -> cadastroRestauranteService.desassociarFormaPagamento(restauranteId, formaPagamentoId));
+
+	    assertEquals("Não existe um cadastro de forma de pagamento com código 999", ex.getMessage());
+	    verify(restauranteRepository).findById(restauranteId);
+	    verify(cadastroFormaPagamento).buscarOuFalhar(formaPagamentoId);
+	}
+	
+	
 }

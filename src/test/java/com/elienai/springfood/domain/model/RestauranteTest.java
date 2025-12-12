@@ -86,5 +86,61 @@ class RestauranteTest {
         restaurante.inativar();
 
         assertThat(restaurante.getAtivo()).isFalse();
+    } 
+    
+    @Test
+    void deveAdicionarFormaPagamento_quandoFormaPagamentoNaoExistir() {
+        Restaurante restaurante = new Restaurante();
+        FormaPagamento pagamento = new FormaPagamento();
+        pagamento.setId(1L);
+        pagamento.setDescricao("Cartão de Crédito");
+
+        boolean adicionou = restaurante.adicionarFormaPagamento(pagamento);
+
+        assertThat(adicionou).isTrue();
+        assertThat(restaurante.getFormasPagamento())
+            .contains(pagamento);
+    }
+
+    @Test
+    void naoDeveAdicionarFormaPagamento_quandoFormaPagamentoJaExistir() {
+        Restaurante restaurante = new Restaurante();
+        FormaPagamento pagamento = new FormaPagamento();
+        pagamento.setId(1L);
+
+        restaurante.adicionarFormaPagamento(pagamento);
+        boolean adicionou = restaurante.adicionarFormaPagamento(pagamento);
+
+        assertThat(adicionou).isFalse();
+        assertThat(restaurante.getFormasPagamento())
+            .hasSize(1)
+            .contains(pagamento);
+    }
+
+    @Test
+    void deveRemoverFormaPagamento_quandoFormaPagamentoExistir() {
+        Restaurante restaurante = new Restaurante();
+        FormaPagamento pagamento = new FormaPagamento();
+        pagamento.setId(1L);
+
+        restaurante.adicionarFormaPagamento(pagamento);
+        boolean removeu = restaurante.removerFormaPagamento(pagamento);
+
+        assertThat(removeu).isTrue();
+        assertThat(restaurante.getFormasPagamento())
+            .doesNotContain(pagamento);
+    }
+
+    @Test
+    void naoDeveRemoverFormaPagamento_quandoFormaPagamentoNaoExistir() {
+        Restaurante restaurante = new Restaurante();
+        FormaPagamento pagamento = new FormaPagamento();
+        pagamento.setId(1L);
+
+        boolean removeu = restaurante.removerFormaPagamento(pagamento);
+
+        assertThat(removeu).isFalse();
+        assertThat(restaurante.getFormasPagamento())
+            .isEmpty();
     }    
 }

@@ -1,5 +1,6 @@
 package com.elienai.springfood.api.mapper;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,7 @@ public class FormaPagamentoResponseMapper {
 		return modelMapper.map(formaPagamento, FormaPagamentoResponse.class);
 	}
 	
-	public List<FormaPagamentoResponse> toCollectionResponse(List<FormaPagamento> formasPagamento) {
+	public List<FormaPagamentoResponse> toCollectionResponse(Collection<FormaPagamento> formasPagamento) {
 		return formasPagamento.stream()
 				.map(formaPagamento -> toResponse(formaPagamento))
 				.collect(Collectors.toList());

@@ -3,11 +3,14 @@ package com.elienai.springfood.domain.model;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -56,11 +59,11 @@ public class Restaurante {
 	@Column(nullable = false, columnDefinition = "datetime")
 	private OffsetDateTime dataAtualizacao;
 	
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "restaurante_forma_pagamento",
 			joinColumns = @JoinColumn(name = "restaurante_id"),
 			inverseJoinColumns = @JoinColumn(name = "forma_pagamento_id"))
-	private List<FormaPagamento> formasPagamento = new ArrayList<>(); 
+	private Set<FormaPagamento> formasPagamento = new HashSet<>(); 
 	
 	@OneToMany(mappedBy = "restaurante")
 	private List<Produto> produtos = new ArrayList<>();
@@ -71,5 +74,14 @@ public class Restaurante {
 	
 	public void inativar() {
 		setAtivo(false);
-	}	
+	}
+	
+	public boolean removerFormaPagamento(FormaPagamento formaPagamento) {
+		return getFormasPagamento().remove(formaPagamento);
+	}
+	
+	public boolean adicionarFormaPagamento(FormaPagamento formaPagamento) {
+		return getFormasPagamento().add(formaPagamento);
+	}
+	
 }
