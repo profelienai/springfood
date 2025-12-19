@@ -1,0 +1,7 @@
+{
+  "nome": "Batata Frita",
+  "descricao": "Porção média",
+  "preco": 12.50,
+  "ativo": true,
+  "atr_inexistente": "beta"  
+}
