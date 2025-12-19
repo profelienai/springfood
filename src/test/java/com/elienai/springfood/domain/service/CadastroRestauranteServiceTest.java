@@ -285,6 +285,56 @@ public class CadastroRestauranteServiceTest {
 	}
 	
 	@Test
+	void testAbrir_ComSucesso() {
+		Long restauranteId = 10L;
+		restaurante10.setAberto(false);
+		
+		when(restauranteRepository.findById(restauranteId)).thenReturn(Optional.of(restaurante10));
+
+		assertDoesNotThrow(() -> cadastroRestauranteService.abrir(restauranteId));
+
+		assertTrue(restaurante10.getAberto());
+		verify(restauranteRepository).findById(restauranteId);
+	}	
+	
+	@Test
+	void testFechar_ComSucesso() {
+		Long restauranteId = 10L;
+		restaurante10.setAberto(true);
+		
+		when(restauranteRepository.findById(restauranteId)).thenReturn(Optional.of(restaurante10));
+
+		assertDoesNotThrow(() -> cadastroRestauranteService.fechar(restauranteId));
+
+		assertFalse(restaurante10.getAberto());
+		verify(restauranteRepository).findById(restauranteId);
+	}	
+	
+	@Test
+	void testAbrir_LancarExcecaoQuandoRestauranteNaoExiste() {
+		Long restauranteId = 999L;
+		when(restauranteRepository.findById(restauranteId)).thenReturn(Optional.empty());
+
+		EntidadeNaoEncontradaException ex = 
+				assertThrows(EntidadeNaoEncontradaException.class, () -> cadastroRestauranteService.abrir(restauranteId));
+
+		assertEquals("Não existe um cadastro de restaurante com código 999", ex.getMessage());
+		verify(restauranteRepository).findById(restauranteId);
+	}
+	
+	@Test
+	void testFechar_LancarExcecaoQuandoRestauranteNaoExiste() {
+		Long restauranteId = 999L;
+		when(restauranteRepository.findById(restauranteId)).thenReturn(Optional.empty());
+
+		EntidadeNaoEncontradaException ex = 
+				assertThrows(EntidadeNaoEncontradaException.class, () -> cadastroRestauranteService.fechar(restauranteId));
+
+		assertEquals("Não existe um cadastro de restaurante com código 999", ex.getMessage());
+		verify(restauranteRepository).findById(restauranteId);
+	}	
+	
+	@Test
 	void testAssociarFormaPagamento_ComSucesso() {
 	    Long restauranteId = 10L;
 	    Long formaPagamentoId = 100L;

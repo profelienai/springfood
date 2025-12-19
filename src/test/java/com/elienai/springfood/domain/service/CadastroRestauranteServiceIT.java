@@ -164,6 +164,24 @@ public class CadastroRestauranteServiceIT {
 	}
 	
 	@Test
+	public void deveAbrirRestaurante() {
+		Long restauranteId = 2L;
+
+		assertFalse(cadastroRestaurante.buscarOuFalhar(restauranteId).getAberto());
+		cadastroRestaurante.abrir(restauranteId);
+		assertTrue(cadastroRestaurante.buscarOuFalhar(restauranteId).getAberto());
+	}
+	
+	@Test
+	public void deveFecharRestaurante() {
+		Long restauranteId = 1L;
+		
+		assertTrue(cadastroRestaurante.buscarOuFalhar(restauranteId).getAberto());
+		cadastroRestaurante.fechar(restauranteId);
+		assertFalse(cadastroRestaurante.buscarOuFalhar(restauranteId).getAberto());
+	}	
+	
+	@Test
 	public void deveAssociarFormaPagamento() {
 	    Long restauranteId = 1L;
 	    Long formaPagamentoId = 1L;

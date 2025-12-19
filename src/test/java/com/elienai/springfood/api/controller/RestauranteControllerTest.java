@@ -188,6 +188,62 @@ public class RestauranteControllerTest {
 		verify(cadastroRestaurante).excluir(1L);
 	}
 	
+	@Test
+	public void deveAtivarRestaurante() throws Exception {
+		mockMvc.perform(put("/restaurantes/{id}/ativo", 1L))
+			.andExpect(status().isNoContent());
+
+		verify(cadastroRestaurante).ativar(1L);
+	}	
+	
+	@Test
+	public void deveInativarRestaurante() throws Exception {
+		mockMvc.perform(delete("/restaurantes/{id}/ativo", 1L))
+			.andExpect(status().isNoContent());
+
+		verify(cadastroRestaurante).inativar(1L);
+	}
+	
+	@Test
+	public void deveAtivarMultiplosRestaurantes() throws Exception {
+		List<Long> ids = Arrays.asList(1L, 2L, 3L);
+
+		mockMvc.perform(put("/restaurantes/ativacoes")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(ResourceUtils.getObjectAsJson(ids)))
+			.andExpect(status().isNoContent());
+
+		verify(cadastroRestaurante).ativar(ids);
+	}
+
+	@Test
+	public void deveInativarMultiplosRestaurantes() throws Exception {
+		List<Long> ids = Arrays.asList(1L, 2L, 3L);
+
+		mockMvc.perform(delete("/restaurantes/ativacoes")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(ResourceUtils.getObjectAsJson(ids)))
+			.andExpect(status().isNoContent());
+
+		verify(cadastroRestaurante).inativar(ids);
+	}
+	
+	@Test
+	public void deveAbrirRestaurante() throws Exception {
+		mockMvc.perform(put("/restaurantes/{id}/abertura", 1L))
+			.andExpect(status().isNoContent());
+
+		verify(cadastroRestaurante).abrir(1L);
+	}
+
+	@Test
+	public void deveFecharRestaurante() throws Exception {
+		mockMvc.perform(put("/restaurantes/{id}/fechamento", 1L))
+			.andExpect(status().isNoContent());
+
+		verify(cadastroRestaurante).fechar(1L);
+	}
+	
 	private void prepararDados() {
 		Cozinha cozinhaItaliana = new Cozinha();
 		cozinhaItaliana.setId(1L);

@@ -61,13 +61,15 @@ public class RestauranteResponseMapperTest {
 		restaurante.setCozinha(cozinha);
 		restaurante.setEndereco(endereco);
 		restaurante.ativar();
+		restaurante.abrir();
 		
 		var restauranteResponse = mapper.toResponse(restaurante);
 		
 		assertThat(restauranteResponse)
 			.isNotNull()
-			.extracting(RestauranteResponse::getId, RestauranteResponse::getNome, RestauranteResponse::getTaxaFrete, RestauranteResponse::getAtivo)
-			.containsExactly(1L, "Borbulha", new BigDecimal(10.99d), Boolean.TRUE);
+			.extracting(RestauranteResponse::getId, RestauranteResponse::getNome, RestauranteResponse::getTaxaFrete, 
+					    RestauranteResponse::getAtivo, RestauranteResponse::getAberto)
+			.containsExactly(1L, "Borbulha", new BigDecimal(10.99d), Boolean.TRUE, Boolean.TRUE);
 
 		assertThat(restauranteResponse.getCozinha())
 		.isNotNull()
@@ -90,12 +92,14 @@ public class RestauranteResponseMapperTest {
 		restauranteBorbulha.setTaxaFrete(new BigDecimal(10.99d));
 		restauranteBorbulha.setNome("Borbulha");
 		restauranteBorbulha.ativar();
+		restauranteBorbulha.fechar();
 		
 		var restauranteDiNapoli = new Restaurante();
 		restauranteDiNapoli.setId(2L);
 		restauranteDiNapoli.setTaxaFrete(new BigDecimal(12.99d));
 		restauranteDiNapoli.setNome("Di Napoli");
 		restauranteDiNapoli.inativar();
+		restauranteDiNapoli.abrir();
 		
 		var restaurante = List.of(restauranteBorbulha, restauranteDiNapoli);
 		
@@ -104,9 +108,10 @@ public class RestauranteResponseMapperTest {
 		assertThat(restaurantesResponse)
 			.isNotNull()
 			.hasSize(2)
-			.extracting(RestauranteResponse::getId, RestauranteResponse::getNome, RestauranteResponse::getTaxaFrete, RestauranteResponse::getAtivo)
+			.extracting(RestauranteResponse::getId, RestauranteResponse::getNome, RestauranteResponse::getTaxaFrete, 
+					    RestauranteResponse::getAtivo, RestauranteResponse::getAberto)
 			.containsExactlyInAnyOrder(
-				tuple(1L, "Borbulha", new BigDecimal(10.99d), Boolean.TRUE),
-				tuple(2L, "Di Napoli", new BigDecimal(12.99d), Boolean.FALSE));
+				tuple(1L, "Borbulha", new BigDecimal(10.99d), Boolean.TRUE, Boolean.FALSE),
+				tuple(2L, "Di Napoli", new BigDecimal(12.99d), Boolean.FALSE, Boolean.TRUE));
 	}
 }

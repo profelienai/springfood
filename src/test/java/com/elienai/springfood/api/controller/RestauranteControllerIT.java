@@ -80,6 +80,10 @@ public class RestauranteControllerIT {
 		databaseCleaner.clearTables();
 	}
 
+	// =====================================================
+	// CONSULTAS (GET)
+	// =====================================================	
+	
 	@Test
 	public void deveRetornarStatus200_QuandoConsultarRestaurantes() {
 		given()
@@ -123,6 +127,25 @@ public class RestauranteControllerIT {
 	}	
 	
 	@Test
+	public void deveRetornarStatus404_QuandoConsultarRestauranteInexistente() {
+		given()
+			.pathParam("restauranteId", 99L)
+			.accept(ContentType.JSON)
+		.when()
+			.get("/{restauranteId}")
+		.then()
+			.statusCode(HttpStatus.NOT_FOUND.value())
+	        .body("status", is(404))
+	        .body("title", is("Recurso não encontrado"))
+	        .body("detail", is("Não existe um cadastro de restaurante com código 99"))
+	        .body("userMessage", is("Não existe um cadastro de restaurante com código 99"));			
+	}		
+	
+	// =====================================================
+	// CADASTRO (POST)
+	// =====================================================	
+	
+	@Test
 	public void deveRetornarStatus201_QuandoAdicionarRestaurante() {
 		given()
 			.body(jsonRestauranteCadore)
@@ -151,114 +174,6 @@ public class RestauranteControllerIT {
 			.body("endereco.estado", is("Rio de Janeiro"));	
 	}
 	
-	@Test
-	public void deveRetornarStatus200_QuandoAlterarRestauranteExistente() {
-		given()
-			.pathParam("restauranteId", 1L)
-			.body(jsonRestauranteCadore)
-			.contentType(ContentType.JSON)
-			.accept(ContentType.JSON)
-		.when()
-			.put("/{restauranteId}")
-		.then()
-			.statusCode(HttpStatus.OK.value())
-
-			.body("id", is(1))
-			.body("nome", is("Cadore"))
-			.body("taxaFrete", is(10.99f))
-			
-			.body("cozinha.id", is(1))
-			.body("cozinha.nome", is("Italiana"))
-			
-			.body("ativo", is(true))
-			
-			.body("endereco.cep", is("38400-999"))
-			.body("endereco.logradouro", is("Rua Afonso Pena"))
-			.body("endereco.numero", is("1500"))
-			.body("endereco.complemento", nullValue())
-			.body("endereco.bairro", is("Centro"))
-			.body("endereco.cidade", is("Campo Grande"))
-			.body("endereco.estado", is("Rio de Janeiro"));
-	}	
-
-	@Test
-	public void deveRetornarStatus204_QuandoRemoverRestauranteExistente() {
-		given()
-			.pathParam("restauranteId", 1L)
-			.accept(ContentType.JSON)
-		.when()
-			.delete("/{restauranteId}")
-		.then()
-			.statusCode(HttpStatus.NO_CONTENT.value())
-			.body(is(emptyOrNullString()));
-	}	
-
-	@Test
-	public void deveRetornarStatus204_QuandoAtivarRestauranteExistente() {
-		given()
-			.pathParam("restauranteId", 2L)
-			.accept(ContentType.JSON)
-		.when()
-			.put("/{restauranteId}/ativo")
-		.then()
-			.statusCode(HttpStatus.NO_CONTENT.value())
-			.body(is(emptyOrNullString()));
-	}	
-	
-	@Test
-	public void deveRetornarStatus204_QuandoInativarRestauranteExistente() {
-		given()
-			.pathParam("restauranteId", 1L)
-			.accept(ContentType.JSON)
-		.when()
-			.delete("/{restauranteId}/ativo")
-		.then()
-			.statusCode(HttpStatus.NO_CONTENT.value())
-			.body(is(emptyOrNullString()));
-	}		
-	
-	@Test
-	public void deveRetornarStatus204_QuandoAtivarMultiplosRestaurantesExistentes() {
-		given()
-			.body("[1, 2]")
-			.contentType(ContentType.JSON)
-			.accept(ContentType.JSON)
-		.when()
-			.put("/ativacoes")
-		.then()
-			.statusCode(HttpStatus.NO_CONTENT.value())
-			.body(is(emptyOrNullString()));
-	}	
-	
-	@Test
-	public void deveRetornarStatus204_QuandoInativarMultiplosRestaurantesExistentes() {
-		given()
-			.body("[1, 2]")
-			.contentType(ContentType.JSON)
-			.accept(ContentType.JSON)
-		.when()
-			.delete("/ativacoes")
-		.then()
-			.statusCode(HttpStatus.NO_CONTENT.value())
-			.body(is(emptyOrNullString()));
-	}			
-	
-	@Test
-	public void deveRetornarStatus404_QuandoConsultarRestauranteInexistente() {
-		given()
-			.pathParam("restauranteId", 99L)
-			.accept(ContentType.JSON)
-		.when()
-			.get("/{restauranteId}")
-		.then()
-			.statusCode(HttpStatus.NOT_FOUND.value())
-	        .body("status", is(404))
-	        .body("title", is("Recurso não encontrado"))
-	        .body("detail", is("Não existe um cadastro de restaurante com código 99"))
-	        .body("userMessage", is("Não existe um cadastro de restaurante com código 99"));			
-	}	
-
-
 	@Test
 	public void deveRetornarStatus400_QuandoAdicionarRestauranteComDadosInvalidos() {
 		given()
@@ -374,8 +289,42 @@ public class RestauranteControllerIT {
 			.body("title", is("Mensagem incompreensível"))
 			.body("detail", is("A propriedade 'cozinha.nome' não existe. Corrija ou remova essa propriedade e tente novamente."))
 			.body("userMessage", is("Ocorreu um erro interno inesperado no sistema. Tente novamente e se o problema persistir, entre em contato com o administrador do sistema."));		
-	}		
+	}			
 	
+	// =====================================================
+	// ATUALIZAÇÃO (PUT)
+	// =====================================================	
+	
+	@Test
+	public void deveRetornarStatus200_QuandoAlterarRestauranteExistente() {
+		given()
+			.pathParam("restauranteId", 1L)
+			.body(jsonRestauranteCadore)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/{restauranteId}")
+		.then()
+			.statusCode(HttpStatus.OK.value())
+
+			.body("id", is(1))
+			.body("nome", is("Cadore"))
+			.body("taxaFrete", is(10.99f))
+			
+			.body("cozinha.id", is(1))
+			.body("cozinha.nome", is("Italiana"))
+			
+			.body("ativo", is(true))
+			
+			.body("endereco.cep", is("38400-999"))
+			.body("endereco.logradouro", is("Rua Afonso Pena"))
+			.body("endereco.numero", is("1500"))
+			.body("endereco.complemento", nullValue())
+			.body("endereco.bairro", is("Centro"))
+			.body("endereco.cidade", is("Campo Grande"))
+			.body("endereco.estado", is("Rio de Janeiro"));
+	}	
+
 	@Test
 	public void deveRetornarStatus400_QuandoAlterarRestauranteComDadosInvalidos() {
 		given()
@@ -457,7 +406,23 @@ public class RestauranteControllerIT {
 			.body("detail", is("A propriedade 'cozinha.nome' não existe. Corrija ou remova essa propriedade e tente novamente."))
 			.body("userMessage", is("Ocorreu um erro interno inesperado no sistema. Tente novamente e se o problema persistir, entre em contato com o administrador do sistema."));		
 	}		
-
+	
+	// =====================================================
+	// REMOÇÃO (DELETE)
+	// =====================================================	
+	
+	@Test
+	public void deveRetornarStatus204_QuandoRemoverRestauranteExistente() {
+		given()
+			.pathParam("restauranteId", 1L)
+			.accept(ContentType.JSON)
+		.when()
+			.delete("/{restauranteId}")
+		.then()
+			.statusCode(HttpStatus.NO_CONTENT.value())
+			.body(is(emptyOrNullString()));
+	}	
+	
 	@Test
 	public void deveRetornarStatus404_QuandoRemoverRestauranteInexistente() {
 		given()
@@ -472,7 +437,35 @@ public class RestauranteControllerIT {
 			.body("title", is("Recurso não encontrado"))
 			.body("detail", is("Não existe um cadastro de restaurante com código 99"))
 			.body("userMessage", is("Não existe um cadastro de restaurante com código 99"));		
-	}
+	}	
+	
+	// =====================================================
+	// ATIVAÇÃO / INATIVAÇÃO (SINGULAR)
+	// =====================================================	
+
+	@Test
+	public void deveRetornarStatus204_QuandoAtivarRestauranteExistente() {
+		given()
+			.pathParam("restauranteId", 2L)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/{restauranteId}/ativo")
+		.then()
+			.statusCode(HttpStatus.NO_CONTENT.value())
+			.body(is(emptyOrNullString()));
+	}	
+	
+	@Test
+	public void deveRetornarStatus204_QuandoInativarRestauranteExistente() {
+		given()
+			.pathParam("restauranteId", 1L)
+			.accept(ContentType.JSON)
+		.when()
+			.delete("/{restauranteId}/ativo")
+		.then()
+			.statusCode(HttpStatus.NO_CONTENT.value())
+			.body(is(emptyOrNullString()));
+	}		
 	
 	@Test
 	public void deveRetornarStatus404_QuandoAtivarRestauranteInexistente() {
@@ -506,6 +499,37 @@ public class RestauranteControllerIT {
 			.body("userMessage", is("Não existe um cadastro de restaurante com código 99"));		
 	}	
 	
+	// =====================================================
+	// ATIVAÇÃO / INATIVAÇÃO (MÚLTIPLOS)
+	// =====================================================		
+	
+	@Test
+	public void deveRetornarStatus204_QuandoAtivarMultiplosRestaurantesExistentes() {
+		given()
+			.body("[1, 2]")
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/ativacoes")
+		.then()
+			.statusCode(HttpStatus.NO_CONTENT.value())
+			.body(is(emptyOrNullString()));
+	}	
+	
+	@Test
+	public void deveRetornarStatus204_QuandoInativarMultiplosRestaurantesExistentes() {
+		given()
+			.body("[1, 2]")
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.delete("/ativacoes")
+		.then()
+			.statusCode(HttpStatus.NO_CONTENT.value())
+			.body(is(emptyOrNullString()));
+	}			
+	
+
 	@Test
 	public void deveRetornarStatus400_QuandoAtivarMultiplosRestaurantesComInexistente() {
 		given()
@@ -536,6 +560,66 @@ public class RestauranteControllerIT {
 			.body("status", is(400))
 			.body("type",  is("https://springfood.com.br/erro-negocio"))
 			.body("title", is("Violação de regra de negócio"))
+			.body("detail", is("Não existe um cadastro de restaurante com código 99"))
+			.body("userMessage", is("Não existe um cadastro de restaurante com código 99"));		
+	}		
+	
+	// =====================================================
+	// ABERTURA / FECHAMENTO
+	// =====================================================
+	
+	@Test
+	public void deveRetornarStatus204_QuandoAbrirRestauranteExistente() {
+		given()
+			.pathParam("restauranteId", 2L)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/{restauranteId}/abertura")
+		.then()
+			.statusCode(HttpStatus.NO_CONTENT.value())
+			.body(is(emptyOrNullString()));
+	}	
+	
+	@Test
+	public void deveRetornarStatus204_QuandoFecharRestauranteExistente() {
+		given()
+			.pathParam("restauranteId", 1L)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/{restauranteId}/fechamento")
+		.then()
+			.statusCode(HttpStatus.NO_CONTENT.value())
+			.body(is(emptyOrNullString()));
+	}		
+	
+	@Test
+	public void deveRetornarStatus404_QuandoAbrirRestauranteInexistente() {
+		given()
+			.pathParam("restauranteId", 99L)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/{restauranteId}/abertura")
+		.then()
+			.statusCode(HttpStatus.NOT_FOUND.value())
+			.body("status", is(404))
+			.body("type",  is("https://springfood.com.br/recurso-nao-encontrado"))
+			.body("title", is("Recurso não encontrado"))
+			.body("detail", is("Não existe um cadastro de restaurante com código 99"))
+			.body("userMessage", is("Não existe um cadastro de restaurante com código 99"));	
+	}	
+	
+	@Test
+	public void deveRetornarStatus404_QuandoFecharRestauranteInexistente() {
+		given()
+			.pathParam("restauranteId", 99L)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/{restauranteId}/fechamento")
+		.then()
+			.statusCode(HttpStatus.NOT_FOUND.value())
+			.body("status", is(404))
+			.body("type",  is("https://springfood.com.br/recurso-nao-encontrado"))
+			.body("title", is("Recurso não encontrado"))
 			.body("detail", is("Não existe um cadastro de restaurante com código 99"))
 			.body("userMessage", is("Não existe um cadastro de restaurante com código 99"));		
 	}		

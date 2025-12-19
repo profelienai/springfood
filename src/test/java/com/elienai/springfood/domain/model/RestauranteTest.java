@@ -89,6 +89,26 @@ class RestauranteTest {
     } 
     
     @Test
+    void deveAbrirRestaurante_quandoChamarMetodoAbrir() {
+        Restaurante restaurante = new Restaurante();
+        restaurante.setAberto(false);
+
+        restaurante.abrir();
+
+        assertThat(restaurante.getAberto()).isTrue();
+    }
+
+    @Test
+    void deveFecharRestaurante_quandoChamarMetodoFechar() {
+        Restaurante restaurante = new Restaurante();
+        restaurante.setAberto(true);
+
+        restaurante.fechar();
+
+        assertThat(restaurante.getAberto()).isFalse();
+    } 
+    
+    @Test
     void deveAdicionarFormaPagamento_quandoFormaPagamentoNaoExistir() {
         Restaurante restaurante = new Restaurante();
         FormaPagamento pagamento = new FormaPagamento();
