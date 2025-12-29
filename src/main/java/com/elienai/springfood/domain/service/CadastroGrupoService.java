@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.elienai.springfood.domain.exception.EntidadeEmUsoException;
 import com.elienai.springfood.domain.exception.GrupoNaoEncontradoException;
 import com.elienai.springfood.domain.model.Grupo;
+import com.elienai.springfood.domain.model.Permissao;
 import com.elienai.springfood.domain.repository.GrupoRepository;
 
 @Service
@@ -18,6 +19,9 @@ public class CadastroGrupoService {
 
 	@Autowired
 	private GrupoRepository grupoRepository;
+	
+	@Autowired
+	private CadastroPermissaoService cadastroPermissao;
 	
 	@Transactional
 	public Grupo salvar(Grupo grupo) {
@@ -38,6 +42,22 @@ public class CadastroGrupoService {
 				String.format(MSG_GRUPO_EM_USO, grupoId));
 		}
 	}
+	
+	@Transactional
+	public boolean desassociarPermissao(Long grupoId, Long permissaoId) {
+		Grupo grupo = buscarOuFalhar(grupoId);
+		Permissao permissao = cadastroPermissao.buscarOuFalhar(permissaoId);
+		
+		return grupo.removerPermissao(permissao);
+	}
+	
+	@Transactional
+	public boolean associarPermissao(Long grupoId, Long permissaoId) {
+		Grupo grupo = buscarOuFalhar(grupoId);
+		Permissao permissao = cadastroPermissao.buscarOuFalhar(permissaoId);
+		
+		return grupo.adicionarPermissao(permissao);
+	}	
 	
 	@Transactional(readOnly = true)
 	public Grupo buscarOuFalhar(Long grupoId) {

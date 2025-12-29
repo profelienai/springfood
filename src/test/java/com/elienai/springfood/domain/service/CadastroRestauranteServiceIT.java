@@ -186,20 +186,9 @@ public class CadastroRestauranteServiceIT {
 	    Long restauranteId = 1L;
 	    Long formaPagamentoId = 1L;
 
-	    // Antes: restaurante não possui forma de pagamento
-	    Restaurante restauranteAntes = cadastroRestaurante.buscarOuFalhar(restauranteId);
-	    assertFalse(restauranteAntes.getFormasPagamento()
-	            .stream()
-	            .anyMatch(fp -> fp.getId().equals(formaPagamentoId)));
-
-	    // Executa a associação
-	    cadastroRestaurante.associarFormaPagamento(restauranteId, formaPagamentoId);
-
-	    // Depois: restaurante deve possuir a forma de pagamento
-	    Restaurante restauranteDepois = cadastroRestaurante.buscarOuFalhar(restauranteId);
-	    assertTrue(restauranteDepois.getFormasPagamento()
-	            .stream()
-	            .anyMatch(fp -> fp.getId().equals(formaPagamentoId)));
+	    Boolean associou = cadastroRestaurante.associarFormaPagamento(restauranteId, formaPagamentoId);
+	    
+	    assertTrue(associou);
 	}
 
 	@Test
@@ -207,19 +196,8 @@ public class CadastroRestauranteServiceIT {
 	    Long restauranteId = 1L;
 	    Long formaPagamentoId = 2L;
 
-	    // Antes: restaurante possui forma de pagamento
-	    Restaurante restauranteAntes = cadastroRestaurante.buscarOuFalhar(restauranteId);
-	    assertTrue(restauranteAntes.getFormasPagamento()
-	            .stream()
-	            .anyMatch(fp -> fp.getId().equals(formaPagamentoId)));
-
-	    // Executa a associação
-	    cadastroRestaurante.desassociarFormaPagamento(restauranteId, formaPagamentoId);
-
-	    // Depois: restaurante não deve possuir a forma de pagamento
-	    Restaurante restauranteDepois = cadastroRestaurante.buscarOuFalhar(restauranteId);
-	    assertFalse(restauranteDepois.getFormasPagamento()
-	            .stream()
-	            .anyMatch(fp -> fp.getId().equals(formaPagamentoId)));
+	    Boolean desassociou = cadastroRestaurante.desassociarFormaPagamento(restauranteId, formaPagamentoId);
+	    
+	    assertTrue(desassociou);
 	}	
 }

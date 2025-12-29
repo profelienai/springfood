@@ -20,18 +20,6 @@ import com.elienai.springfood.domain.model.Estado;
 import com.elienai.springfood.domain.repository.EstadoRepository;
 import com.elienai.springfood.util.DatabaseCleaner;
 
-/**
- * Testes de integração para CadastroEstadoService.
- * 
- * Cobrem:
- *  - Busca por ID
- *  - Inclusão
- *  - Exclusão
- *  - Exceções quando o estado não existe ou está em uso
- * 
- * Dados iniciais carregados via @Sql.
-*/
-
 @SpringBootTest
 @TestPropertySource("/application-test.properties")
 @Sql(scripts = "/sql/CadastroEstadoServiceIT.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)

@@ -108,5 +108,25 @@ public class CadastroGrupoServiceIT {
 		EntidadeEmUsoException ex = assertThrows(EntidadeEmUsoException.class, () -> cadastroGrupo.excluir(1L));
 		
 		assertEquals("Grupo de código 1 não pode ser removido, pois está em uso", ex.getMessage());
+	}
+	
+	@Test
+	public void deveAssociarPermissao() {
+	    Long grupoId = 1L;
+	    Long permissaoId = 2L;
+
+	    Boolean associou = cadastroGrupo.associarPermissao(grupoId, permissaoId);
+	    
+	    assertTrue(associou);
+	}
+
+	@Test
+	public void deveDesassociarPermissao() {
+	    Long grupoId = 1L;
+	    Long permissaoId = 1L;
+
+	    Boolean desassociou = cadastroGrupo.desassociarPermissao(grupoId, permissaoId);
+	    
+	    assertTrue(desassociou);
 	}		
 }
