@@ -14,6 +14,7 @@ import com.elienai.springfood.domain.model.Cidade;
 import com.elienai.springfood.domain.model.Cozinha;
 import com.elienai.springfood.domain.model.FormaPagamento;
 import com.elienai.springfood.domain.model.Restaurante;
+import com.elienai.springfood.domain.model.Usuario;
 import com.elienai.springfood.domain.repository.RestauranteRepository;
 
 @Service
@@ -32,6 +33,9 @@ public class CadastroRestauranteService {
 	
 	@Autowired
 	private CadastroFormaPagamentoService cadastroFormaPagamento;	
+	
+	@Autowired
+	private CadastroUsuarioService cadastroUsuario;	
 	
 	@Transactional
 	public Restaurante salvar(Restaurante restaurante) {
@@ -120,5 +124,21 @@ public class CadastroRestauranteService {
 		FormaPagamento formaPagamento = cadastroFormaPagamento.buscarOuFalhar(formaPagamentoId);
 		
 		return restaurante.adicionarFormaPagamento(formaPagamento);
+	}	
+	
+	@Transactional
+	public boolean desassociarResponsavel(Long restauranteId, Long usuarioId) {
+		Restaurante restaurante = buscarOuFalhar(restauranteId);
+		Usuario usuario = cadastroUsuario.buscarOuFalhar(usuarioId);
+		
+		return restaurante.removerResponsavel(usuario);
+	}
+	
+	@Transactional
+	public boolean associarResponsavel(Long restauranteId, Long usuarioId) {
+		Restaurante restaurante = buscarOuFalhar(restauranteId);
+		Usuario usuario = cadastroUsuario.buscarOuFalhar(usuarioId);
+		
+		return restaurante.adicionarResponsavel(usuario);
 	}	
 }

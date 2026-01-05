@@ -163,4 +163,61 @@ class RestauranteTest {
         assertThat(restaurante.getFormasPagamento())
             .isEmpty();
     }    
+    
+    @Test
+    void deveAdicionarResponsavel_quandoResponsavelNaoExistir() {
+        Restaurante restaurante = new Restaurante();
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setNome("João da Silva");
+
+        boolean adicionou = restaurante.adicionarResponsavel(usuario);
+
+        assertThat(adicionou).isTrue();
+        assertThat(restaurante.getResponsaveis())
+            .contains(usuario);
+    }
+
+    @Test
+    void naoDeveAdicionarResponsavel_quandoResponsavelJaExistir() {
+        Restaurante restaurante = new Restaurante();
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+
+        restaurante.adicionarResponsavel(usuario);
+        boolean adicionou = restaurante.adicionarResponsavel(usuario);
+
+        assertThat(adicionou).isFalse();
+        assertThat(restaurante.getResponsaveis())
+            .hasSize(1)
+            .contains(usuario);
+    }
+
+    @Test
+    void deveRemoverResponsavel_quandoResponsavelExistir() {
+        Restaurante restaurante = new Restaurante();
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+
+        restaurante.adicionarResponsavel(usuario);
+        boolean removeu = restaurante.removerResponsavel(usuario);
+
+        assertThat(removeu).isTrue();
+        assertThat(restaurante.getResponsaveis())
+            .doesNotContain(usuario);
+    }
+
+    @Test
+    void naoDeveRemoverResponsavel_quandoResponsavelNaoExistir() {
+        Restaurante restaurante = new Restaurante();
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+
+        boolean removeu = restaurante.removerResponsavel(usuario);
+
+        assertThat(removeu).isFalse();
+        assertThat(restaurante.getResponsaveis())
+            .isEmpty();
+    }
+    
 }

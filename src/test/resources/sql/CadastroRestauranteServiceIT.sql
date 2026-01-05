@@ -12,3 +12,9 @@ insert into forma_pagamento (id, descricao) values (2, 'Cartão de débito');
 insert into forma_pagamento (id, descricao) values (3, 'Dinheiro');
 
 insert into restaurante_forma_pagamento (restaurante_id, forma_pagamento_id) values (1, 2), (1, 3), (2, 3);
+
+insert into usuario (id, nome, email, senha, data_cadastro) values
+(1, 'João da Silva', 'joao.ger@gmail.com', '123', utc_timestamp),
+(2, 'Maria Joaquina', 'maria.vnd@gmail.com', '123', utc_timestamp);
+
+insert into restaurante_usuario_responsavel (restaurante_id, usuario_id) values (1, 1), (2, 1);

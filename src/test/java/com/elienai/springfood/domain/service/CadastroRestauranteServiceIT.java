@@ -199,5 +199,25 @@ public class CadastroRestauranteServiceIT {
 	    Boolean desassociou = cadastroRestaurante.desassociarFormaPagamento(restauranteId, formaPagamentoId);
 	    
 	    assertTrue(desassociou);
-	}	
+	}
+	
+	@Test
+	public void deveAssociarResponsavel() {
+	    Long restauranteId = 1L;
+	    Long formaPagamentoId = 2L;
+
+	    Boolean associou = cadastroRestaurante.associarResponsavel(restauranteId, formaPagamentoId);
+	    
+	    assertTrue(associou);
+	}
+
+	@Test
+	public void deveDesassociarResponsavel() {
+	    Long restauranteId = 1L;
+	    Long formaPagamentoId = 1L;
+
+	    Boolean desassociou = cadastroRestaurante.desassociarResponsavel(restauranteId, formaPagamentoId);
+	    
+	    assertTrue(desassociou);
+	}		
 }

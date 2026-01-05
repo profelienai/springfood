@@ -32,11 +32,13 @@ import com.elienai.springfood.domain.exception.CozinhaNaoEncontradaException;
 import com.elienai.springfood.domain.exception.EntidadeEmUsoException;
 import com.elienai.springfood.domain.exception.EntidadeNaoEncontradaException;
 import com.elienai.springfood.domain.exception.FormaPagamentoNaoEncontradaException;
+import com.elienai.springfood.domain.exception.UsuarioNaoEncontradoException;
 import com.elienai.springfood.domain.model.Cidade;
 import com.elienai.springfood.domain.model.Cozinha;
 import com.elienai.springfood.domain.model.Endereco;
 import com.elienai.springfood.domain.model.FormaPagamento;
 import com.elienai.springfood.domain.model.Restaurante;
+import com.elienai.springfood.domain.model.Usuario;
 import com.elienai.springfood.domain.repository.RestauranteRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,11 +59,16 @@ public class CadastroRestauranteServiceTest {
 	@Mock
 	private CadastroFormaPagamentoService cadastroFormaPagamento;
 	
+	@Mock
+	private CadastroUsuarioService cadastroUsuario;
+	
+	
 	private Cozinha cozinha;
 	private Cidade cidade;
 	private Restaurante restaurante10;
 	private Restaurante restaurante20;
 	private FormaPagamento formaPagamento;
+	private Usuario usuario;
 	
 	@BeforeEach
 	void setUp() {
@@ -91,6 +98,9 @@ public class CadastroRestauranteServiceTest {
 		formaPagamento = new FormaPagamento();
 		formaPagamento.setId(100L);
 
+		usuario = new Usuario();
+		usuario.setId(100L);
+		
 		restaurante10.setFormasPagamento(new HashSet<>());		
 	}
 	
@@ -434,5 +444,114 @@ public class CadastroRestauranteServiceTest {
 	    verify(cadastroFormaPagamento).buscarOuFalhar(formaPagamentoId);
 	}
 	
+	@Test
+	void testAssociarResponsavel_ComSucesso() {
+	    Long restauranteId = 10L;
+	    Long usuarioId = 100L;
+
+	    when(restauranteRepository.findById(restauranteId))
+	        .thenReturn(Optional.of(restaurante10));
+	    when(cadastroUsuario.buscarOuFalhar(usuarioId))
+	        .thenReturn(usuario);
+
+	    assertDoesNotThrow(() ->
+	        cadastroRestauranteService.associarResponsavel(restauranteId, usuarioId));
+
+	    assertTrue(restaurante10.getResponsaveis().contains(usuario));
+
+	    verify(restauranteRepository).findById(restauranteId);
+	    verify(cadastroUsuario).buscarOuFalhar(usuarioId);
+	}
+
+	@Test
+	void testAssociarResponsavel_LancarExcecaoQuandoRestauranteNaoExiste() {
+	    Long restauranteId = 999L;
+	    Long usuarioId = 100L;
+
+	    when(restauranteRepository.findById(restauranteId))
+	        .thenReturn(Optional.empty());
+
+	    EntidadeNaoEncontradaException ex =
+	        assertThrows(EntidadeNaoEncontradaException.class,
+	            () -> cadastroRestauranteService.associarResponsavel(restauranteId, usuarioId));
+
+	    assertEquals("Não existe um cadastro de restaurante com código 999", ex.getMessage());
+	    verify(restauranteRepository).findById(restauranteId);
+	}
+
+	@Test
+	void testAssociarResponsavel_LancarExcecaoQuandoUsuarioNaoExiste() {
+	    Long restauranteId = 10L;
+	    Long usuarioId = 999L;
+
+	    when(restauranteRepository.findById(restauranteId))
+	        .thenReturn(Optional.of(restaurante10));
+	    when(cadastroUsuario.buscarOuFalhar(usuarioId))
+	        .thenThrow(new UsuarioNaoEncontradoException(usuarioId));
+
+	    EntidadeNaoEncontradaException ex =
+	        assertThrows(EntidadeNaoEncontradaException.class,
+	            () -> cadastroRestauranteService.associarResponsavel(restauranteId, usuarioId));
+
+	    assertEquals("Não existe um cadastro de usuário com código 999", ex.getMessage());
+	    verify(restauranteRepository).findById(restauranteId);
+	    verify(cadastroUsuario).buscarOuFalhar(usuarioId);
+	}
+
+	@Test
+	void testDesassociarResponsavel_ComSucesso() {
+	    Long restauranteId = 10L;
+	    Long usuarioId = 100L;
+
+	    restaurante10.getResponsaveis().add(usuario);
+
+	    when(restauranteRepository.findById(restauranteId))
+	        .thenReturn(Optional.of(restaurante10));
+	    when(cadastroUsuario.buscarOuFalhar(usuarioId))
+	        .thenReturn(usuario);
+
+	    assertDoesNotThrow(() ->
+	        cadastroRestauranteService.desassociarResponsavel(restauranteId, usuarioId));
+
+	    assertFalse(restaurante10.getResponsaveis().contains(usuario));
+
+	    verify(restauranteRepository).findById(restauranteId);
+	    verify(cadastroUsuario).buscarOuFalhar(usuarioId);
+	}
+
+	@Test
+	void testDesassociarResponsavel_LancarExcecaoQuandoRestauranteNaoExiste() {
+	    Long restauranteId = 999L;
+	    Long usuarioId = 100L;
+
+	    when(restauranteRepository.findById(restauranteId))
+	        .thenReturn(Optional.empty());
+
+	    EntidadeNaoEncontradaException ex =
+	        assertThrows(EntidadeNaoEncontradaException.class,
+	            () -> cadastroRestauranteService.desassociarResponsavel(restauranteId, usuarioId));
+
+	    assertEquals("Não existe um cadastro de restaurante com código 999", ex.getMessage());
+	    verify(restauranteRepository).findById(restauranteId);
+	}
+
+	@Test
+	void testDesassociarResponsavel_LancarExcecaoQuandoUsuarioNaoExiste() {
+	    Long restauranteId = 10L;
+	    Long usuarioId = 999L;
+
+	    when(restauranteRepository.findById(restauranteId))
+	        .thenReturn(Optional.of(restaurante10));
+	    when(cadastroUsuario.buscarOuFalhar(usuarioId))
+	        .thenThrow(new UsuarioNaoEncontradoException(usuarioId));
+
+	    EntidadeNaoEncontradaException ex =
+	        assertThrows(EntidadeNaoEncontradaException.class,
+	            () -> cadastroRestauranteService.desassociarResponsavel(restauranteId, usuarioId));
+
+	    assertEquals("Não existe um cadastro de usuário com código 999", ex.getMessage());
+	    verify(restauranteRepository).findById(restauranteId);
+	    verify(cadastroUsuario).buscarOuFalhar(usuarioId);
+	}
 	
 }
