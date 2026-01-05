@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.elienai.springfood.domain.exception.NegocioException;
 import com.elienai.springfood.domain.exception.UsuarioNaoEncontradoException;
+import com.elienai.springfood.domain.model.Grupo;
 import com.elienai.springfood.domain.model.Usuario;
 import com.elienai.springfood.domain.repository.UsuarioRepository;
 
@@ -16,6 +17,9 @@ public class CadastroUsuarioService {
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
+	
+	@Autowired
+	private CadastroGrupoService cadastroGrupo;
 	
 	@Transactional
 	public Usuario salvar(Usuario usuario) {
@@ -31,12 +35,6 @@ public class CadastroUsuarioService {
 		return usuarioRepository.save(usuario);
 	}
 	
-	@Transactional(readOnly = true)
-	public Usuario buscarOuFalhar(Long usuarioId) {
-		return usuarioRepository.findById(usuarioId)
-				.orElseThrow(() -> new UsuarioNaoEncontradoException(usuarioId));
-	}
-	
 	@Transactional
 	public void alterarSenha(Long usuarioId, String senhaAtual, String novaSenha) {
 		Usuario usuario = buscarOuFalhar(usuarioId);
@@ -46,5 +44,27 @@ public class CadastroUsuarioService {
 		}
 		
 		usuario.setSenha(novaSenha);
+	}	
+	
+	@Transactional
+	public boolean desassociarGrupo(Long usuarioId, Long grupoId) {
+		Usuario usuario = buscarOuFalhar(usuarioId);
+		Grupo grupo = cadastroGrupo.buscarOuFalhar(grupoId);
+		
+		return usuario.removerGrupo(grupo);
+	}
+	
+	@Transactional
+	public boolean associarGrupo(Long usuarioId, Long grupoId) {
+		Usuario usuario = buscarOuFalhar(usuarioId);
+		Grupo grupo = cadastroGrupo.buscarOuFalhar(grupoId);
+		
+		return usuario.adicionarGrupo(grupo);
+	}
+	
+	@Transactional(readOnly = true)
+	public Usuario buscarOuFalhar(Long usuarioId) {
+		return usuarioRepository.findById(usuarioId)
+				.orElseThrow(() -> new UsuarioNaoEncontradoException(usuarioId));
 	}	
 }

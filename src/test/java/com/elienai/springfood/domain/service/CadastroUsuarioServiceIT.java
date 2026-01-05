@@ -125,5 +125,25 @@ public class CadastroUsuarioServiceIT {
 		Optional<Usuario> optUsuario = usuarioRepository.findById(usuarioId);
 		assertTrue(optUsuario.isPresent());
 		assertEquals("123", optUsuario.get().getSenha());
-	}	
+	}
+	
+	@Test
+	public void deveAssociarGrupo() {
+	    Long usuarioId = 1L;
+	    Long grupoId = 2L;
+
+	    Boolean associou = cadastroUsuario.associarGrupo(usuarioId, grupoId);
+	    
+	    assertTrue(associou);
+	}
+
+	@Test
+	public void deveDesassociarGrupo() {
+	    Long usuarioId = 1L;
+	    Long grupoId = 1L;
+
+	    Boolean desassociou = cadastroUsuario.desassociarGrupo(usuarioId, grupoId);
+	    
+	    assertTrue(desassociou);
+	}		
 }

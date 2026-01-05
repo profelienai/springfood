@@ -98,4 +98,60 @@ class UsuarioTest {
 
         assertThat(naoCoincide).isFalse();
     }
+    
+    @Test
+    void deveAdicionarGrupo_quandoGrupoNaoExistir() {
+        Usuario usuario = new Usuario();
+        Grupo grupo = new Grupo();
+        
+        grupo.setId(1L);
+        grupo.setNome("CONSULTAR_USUARIOS");
+
+        boolean adicionou = usuario.adicionarGrupo(grupo);
+
+        assertThat(adicionou).isTrue();
+        assertThat(usuario.getGrupos()).contains(grupo);
+    }
+
+    @Test
+    void naoDeveAdicionarGrupo_quandoGrupoJaExistir() {
+        Usuario usuario = new Usuario();
+        Grupo grupo = new Grupo();
+        grupo.setId(1L);
+
+        usuario.adicionarGrupo(grupo);
+        boolean adicionou = usuario.adicionarGrupo(grupo);
+
+        assertThat(adicionou).isFalse();
+        assertThat(usuario.getGrupos())
+            .hasSize(1)
+            .contains(grupo);
+    }
+
+    @Test
+    void deveRemoverGrupo_quandoGrupoExistir() {
+        Usuario usuario = new Usuario();
+        Grupo grupo = new Grupo();
+        grupo.setId(1L);
+
+        usuario.adicionarGrupo(grupo);
+        boolean removeu = usuario.removerGrupo(grupo);
+
+        assertThat(removeu).isTrue();
+        assertThat(usuario.getGrupos())
+            .doesNotContain(grupo);
+    }
+
+    @Test
+    void naoDeveRemoverGrupo_quandoGrupoNaoExistir() {
+        Usuario usuario = new Usuario();
+        Grupo grupo = new Grupo();
+        grupo.setId(1L);
+
+        boolean removeu = usuario.removerGrupo(grupo);
+
+        assertThat(removeu).isFalse();
+        assertThat(usuario.getGrupos())
+            .isEmpty();
+    }    
 }

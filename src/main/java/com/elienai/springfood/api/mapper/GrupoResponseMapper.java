@@ -1,5 +1,6 @@
 package com.elienai.springfood.api.mapper;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,7 @@ public class GrupoResponseMapper {
 		return modelMapper.map(grupo, GrupoResponse.class);
 	}
 	
-	public List<GrupoResponse> toCollectionResponse(List<Grupo> grupos) {
+	public List<GrupoResponse> toCollectionResponse(Collection<Grupo> grupos) {
 		return grupos.stream()
 				.map(grupo -> toResponse(grupo))
 				.collect(Collectors.toList());
