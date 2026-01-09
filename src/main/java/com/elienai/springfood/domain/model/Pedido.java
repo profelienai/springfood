@@ -7,6 +7,9 @@ import java.util.List;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -36,7 +39,8 @@ public class Pedido {
     @Embedded
     private Endereco enderecoEntrega;
     
-    private StatusPedido status;
+	@Enumerated(EnumType.STRING)
+	private StatusPedidoEnum status = StatusPedidoEnum.CRIADO;
     
     @CreationTimestamp
     private OffsetDateTime dataCriacao;
@@ -45,7 +49,7 @@ public class Pedido {
     private OffsetDateTime dataCancelamento;
     private OffsetDateTime dataEntrega;
     
-    @ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private FormaPagamento formaPagamento;
     
@@ -60,4 +64,13 @@ public class Pedido {
     @OneToMany(mappedBy = "pedido")
     private List<ItemPedido> itens = new ArrayList<>();
 
+    public void calcularValorTotal() {
+		getItens().forEach(ItemPedido::calcularPrecoTotal);
+    	
+        this.subtotal = getItens().stream()
+            .map(item -> item.getPrecoTotal())
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        this.valorTotal = this.subtotal.add(this.taxaFrete);
+    }
 }

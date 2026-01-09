@@ -220,4 +220,53 @@ class RestauranteTest {
             .isEmpty();
     }
     
+    @Test
+    void deveAceitarFormaPagamento_quandoFormaPagamentoExistir() {
+        Restaurante restaurante = new Restaurante();
+        FormaPagamento pagamento = new FormaPagamento();
+        pagamento.setId(1L);
+        pagamento.setDescricao("Cartão de Crédito");
+
+        restaurante.adicionarFormaPagamento(pagamento);
+
+        boolean aceita = restaurante.aceitaFormaPagamento(pagamento);
+
+        assertThat(aceita).isTrue();
+    }
+
+    @Test
+    void naoDeveAceitarFormaPagamento_quandoFormaPagamentoNaoExistir() {
+        Restaurante restaurante = new Restaurante();
+        FormaPagamento pagamento = new FormaPagamento();
+        pagamento.setId(1L);
+
+        boolean aceita = restaurante.aceitaFormaPagamento(pagamento);
+
+        assertThat(aceita).isFalse();
+    }
+
+    @Test
+    void deveNaoAceitarFormaPagamento_quandoFormaPagamentoNaoExistir() {
+        Restaurante restaurante = new Restaurante();
+        FormaPagamento pagamento = new FormaPagamento();
+        pagamento.setId(1L);
+
+        boolean naoAceita = restaurante.naoAceitaFormaPagamento(pagamento);
+
+        assertThat(naoAceita).isTrue();
+    }
+
+    @Test
+    void naoDeveNaoAceitarFormaPagamento_quandoFormaPagamentoExistir() {
+        Restaurante restaurante = new Restaurante();
+        FormaPagamento pagamento = new FormaPagamento();
+        pagamento.setId(1L);
+
+        restaurante.adicionarFormaPagamento(pagamento);
+
+        boolean naoAceita = restaurante.naoAceitaFormaPagamento(pagamento);
+
+        assertThat(naoAceita).isFalse();
+    }
+    
 }
