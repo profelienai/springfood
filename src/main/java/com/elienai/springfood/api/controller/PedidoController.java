@@ -2,17 +2,28 @@ package com.elienai.springfood.api.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.elienai.springfood.api.dto.PedidoRequest;
 import com.elienai.springfood.api.dto.PedidoResponse;
 import com.elienai.springfood.api.dto.PedidoResumoResponse;
+import com.elienai.springfood.api.mapper.PedidoRequestMapper;
 import com.elienai.springfood.api.mapper.PedidoResponseMapper;
 import com.elienai.springfood.api.mapper.PedidoResumoResponseMapper;
+import com.elienai.springfood.domain.exception.EntidadeNaoEncontradaException;
+import com.elienai.springfood.domain.exception.NegocioException;
 import com.elienai.springfood.domain.model.Pedido;
+import com.elienai.springfood.domain.model.Usuario;
 import com.elienai.springfood.domain.repository.PedidoRepository;
 import com.elienai.springfood.domain.service.EmissaoPedidoService;
 
@@ -32,6 +43,9 @@ public class PedidoController {
 	@Autowired
 	private PedidoResumoResponseMapper pedidoResumoResponseMapper;
 	
+	@Autowired
+	private PedidoRequestMapper pedidoRequestMapper;
+	
 	@GetMapping
 	public List<PedidoResumoResponse> listar() {
 		List<Pedido> todosPedidos = pedidoRepository.findAll();
@@ -39,11 +53,28 @@ public class PedidoController {
 		return pedidoResumoResponseMapper.toCollectionResponse(todosPedidos);
 	}
 	
+	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
+	public PedidoResponse adicionar(@Valid @RequestBody PedidoRequest pedidoRequest) {
+		try {
+			Pedido novoPedido = pedidoRequestMapper.toDomainObject(pedidoRequest);
+
+			// TODO pegar usuário autenticado
+			novoPedido.setCliente(new Usuario());
+			novoPedido.getCliente().setId(1L);
+
+			novoPedido = emissaoPedido.emitir(novoPedido);
+
+			return pedidoResponseMapper.toResponse(novoPedido);
+		} catch (EntidadeNaoEncontradaException e) {
+			throw new NegocioException(e.getMessage(), e);
+		}
+	}	
+	
 	@GetMapping("/{pedidoId}")
 	public PedidoResponse buscar(@PathVariable Long pedidoId) {
 		Pedido pedido = emissaoPedido.buscarOuFalhar(pedidoId);
 		
 		return pedidoResponseMapper.toResponse(pedido);
 	}
-	
 }

@@ -1,8 +1,11 @@
 package com.elienai.springfood.api.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -22,15 +25,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.elienai.springfood.api.dto.EnderecoResponse;
 import com.elienai.springfood.api.dto.FormaPagamentoResponse;
 import com.elienai.springfood.api.dto.ItemPedidoResponse;
+import com.elienai.springfood.api.dto.PedidoRequest;
 import com.elienai.springfood.api.dto.PedidoResponse;
 import com.elienai.springfood.api.dto.PedidoResumoResponse;
 import com.elienai.springfood.api.dto.RestauranteResumoResponse;
 import com.elienai.springfood.api.dto.UsuarioResponse;
+import com.elienai.springfood.api.mapper.PedidoRequestMapper;
 import com.elienai.springfood.api.mapper.PedidoResponseMapper;
 import com.elienai.springfood.api.mapper.PedidoResumoResponseMapper;
 import com.elienai.springfood.domain.model.Pedido;
 import com.elienai.springfood.domain.repository.PedidoRepository;
 import com.elienai.springfood.domain.service.EmissaoPedidoService;
+import com.elienai.springfood.util.ResourceUtils;
 
 @WebMvcTest(PedidoController.class)
 public class PedidoControllerTest {
@@ -50,6 +56,10 @@ public class PedidoControllerTest {
 	@MockBean
 	private PedidoResumoResponseMapper pedidoResumoResponseMapper;
 
+	@MockBean
+	private PedidoRequestMapper pedidoRequestMapper;
+	
+	
 	private Pedido pedido1;
 	private Pedido pedido2;
 
@@ -58,8 +68,12 @@ public class PedidoControllerTest {
 	private PedidoResumoResponse pedidoResumoResponse1;
 	private PedidoResumoResponse pedidoResumoResponse2;
 	
+	private String jsonPedido;
+	
 	@BeforeEach
 	private void setUp() {
+	    jsonPedido = ResourceUtils.getContentFromResource(
+	            "/json/correto/pedido.json");		
 		prepararDados();
 	}
 	
@@ -155,6 +169,39 @@ public class PedidoControllerTest {
 			.andExpect(jsonPath("$.itens[0].precoTotal").value(60.00))
 			.andExpect(jsonPath("$.itens[0].observacao").value("Sem cebola"));
 	}
+
+	@Test
+	public void deveAdicionarPedido() throws Exception {
+	    when(pedidoRequestMapper.toDomainObject(any(PedidoRequest.class))).thenReturn(pedido1);
+	    when(emissaoPedido.emitir(pedido1)).thenReturn(pedido1);
+	    when(pedidoResponseMapper.toResponse(pedido1)).thenReturn(pedidoResponse1);
+
+	    mockMvc.perform(post("/pedidos")
+	            .content(jsonPedido)
+	            .contentType(MediaType.APPLICATION_JSON)
+	            .accept(MediaType.APPLICATION_JSON))
+	        .andExpect(status().isCreated())
+
+	        // Dados principais
+	        .andExpect(jsonPath("$.id", is(1)))
+	        .andExpect(jsonPath("$.status", is("Criado")))
+	        .andExpect(jsonPath("$.valorTotal", is(70.00)))
+
+	        // Cliente
+	        .andExpect(jsonPath("$.cliente.id", is(10)))
+	        .andExpect(jsonPath("$.cliente.nome", is("João")))
+
+	        // Restaurante
+	        .andExpect(jsonPath("$.restaurante.id", is(100)))
+	        .andExpect(jsonPath("$.restaurante.nome", is("Restaurante A")))
+
+	        // Itens
+	        .andExpect(jsonPath("$.itens", hasSize(1)))
+	        .andExpect(jsonPath("$.itens[0].produtoId", is(50)))
+	        .andExpect(jsonPath("$.itens[0].quantidade", is(2)))
+	        .andExpect(jsonPath("$.itens[0].observacao", is("Sem cebola")));
+	}
+	
 	
 	private void prepararDados() {
 		pedido1 = new Pedido();
