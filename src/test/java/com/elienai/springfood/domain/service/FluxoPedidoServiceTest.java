@@ -19,81 +19,100 @@ import com.elienai.springfood.domain.model.StatusPedidoEnum;
 @ExtendWith(MockitoExtension.class)
 class FluxoPedidoServiceTest {
 
-	@InjectMocks
-	private FluxoPedidoService fluxoPedidoService;
+    @InjectMocks
+    private FluxoPedidoService fluxoPedidoService;
 
-	@Mock
-	private EmissaoPedidoService emissaoPedidoService;
+    @Mock
+    private EmissaoPedidoService emissaoPedidoService;
 
-	private Pedido pedido;
+    private Pedido pedido;
 
-	@BeforeEach
-	void setUp() {
-		pedido = new Pedido();
-		pedido.setId(1L);
-	}
-	
-	@Test
-	void deveConfirmarPedido_QuandoStatusCriado() {
-		pedido.setStatus(StatusPedidoEnum.CRIADO);
-		when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
+    @BeforeEach
+    void setUp() {
+        pedido = new Pedido();
+        pedido.setId(1L); // permitido (id não é regra de negócio)
+    }
 
-		fluxoPedidoService.confirmar(1L);
+    // =====================================================
+    // CONFIRMAR
+    // =====================================================
 
-		assertThat(pedido.getStatus()).isEqualTo(StatusPedidoEnum.CONFIRMADO);
-		assertThat(pedido.getDataConfirmacao()).isNotNull();
-	}
-	
-	@Test
-	void deveLancarExcecao_QuandoConfirmarPedidoComStatusDiferenteDeCriado() {
-		pedido.setStatus(StatusPedidoEnum.CONFIRMADO);
-		when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
+    @Test
+    void deveConfirmarPedido_quandoStatusCriado() {
+        when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
 
-		assertThatThrownBy(() -> fluxoPedidoService.confirmar(1L))
-			.isInstanceOf(NegocioException.class)
-			.hasMessage("Status do pedido 1 não pode ser alterado de Confirmado para Confirmado");
-	}
+        fluxoPedidoService.confirmar(1L);
 
-	@Test
-	void deveCancelarPedido_QuandoStatusCriado() {
-		pedido.setStatus(StatusPedidoEnum.CRIADO);
-		when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
+        assertThat(pedido.getStatus())
+            .isEqualTo(StatusPedidoEnum.CONFIRMADO);
 
-		fluxoPedidoService.cancelar(1L);
+        assertThat(pedido.getDataConfirmacao())
+            .isNotNull();
+    }
 
-		assertThat(pedido.getStatus()).isEqualTo(StatusPedidoEnum.CANCELADO);
-		assertThat(pedido.getDataCancelamento()).isNotNull();
-	}
+    @Test
+    void deveLancarExcecao_quandoConfirmarPedidoJaConfirmado() {
+        pedido.confirmar(); // muda estado de forma válida
 
-	@Test
-	void deveLancarExcecao_QuandoCancelarPedidoComStatusDiferenteDeCriado() {
-		pedido.setStatus(StatusPedidoEnum.CONFIRMADO);
-		when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
+        when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
 
-		assertThatThrownBy(() -> fluxoPedidoService.cancelar(1L))
-			.isInstanceOf(NegocioException.class)
-			.hasMessage("Status do pedido 1 não pode ser alterado de Confirmado para Cancelado");
-	}
+        assertThatThrownBy(() -> fluxoPedidoService.confirmar(1L))
+            .isInstanceOf(NegocioException.class);
+    }
 
-	@Test
-	void deveEntregarPedido_QuandoStatusConfirmado() {
-		pedido.setStatus(StatusPedidoEnum.CONFIRMADO);
-		when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
+    // =====================================================
+    // CANCELAR
+    // =====================================================
 
-		fluxoPedidoService.entregar(1L);
+    @Test
+    void deveCancelarPedido_quandoStatusCriado() {
+        when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
 
-		assertThat(pedido.getStatus()).isEqualTo(StatusPedidoEnum.ENTREGUE);
-		assertThat(pedido.getDataEntrega()).isNotNull();
-	}
+        fluxoPedidoService.cancelar(1L);
 
-	@Test
-	void deveLancarExcecao_QuandoEntregarPedidoComStatusDiferenteDeConfirmado() {
-		pedido.setStatus(StatusPedidoEnum.CRIADO);
-		when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
+        assertThat(pedido.getStatus())
+            .isEqualTo(StatusPedidoEnum.CANCELADO);
 
-		assertThatThrownBy(() -> fluxoPedidoService.entregar(1L))
-			.isInstanceOf(NegocioException.class)
-			.hasMessage("Status do pedido 1 não pode ser alterado de Criado para Entregue");
-	}
-	
+        assertThat(pedido.getDataCancelamento())
+            .isNotNull();
+    }
+
+    @Test
+    void deveLancarExcecao_quandoCancelarPedidoConfirmado() {
+        pedido.confirmar();
+
+        when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
+
+        assertThatThrownBy(() -> fluxoPedidoService.cancelar(1L))
+            .isInstanceOf(NegocioException.class);
+    }
+
+    // =====================================================
+    // ENTREGAR
+    // =====================================================
+
+    @Test
+    void deveEntregarPedido_quandoStatusConfirmado() {
+        pedido.confirmar();
+
+        when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
+
+        fluxoPedidoService.entregar(1L);
+
+        assertThat(pedido.getStatus())
+            .isEqualTo(StatusPedidoEnum.ENTREGUE);
+
+        assertThat(pedido.getDataEntrega())
+            .isNotNull();
+    }
+
+    @Test
+    void deveLancarExcecao_quandoEntregarPedidoCriado() {
+        // pedido ainda está CRIADO
+
+        when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
+
+        assertThatThrownBy(() -> fluxoPedidoService.entregar(1L))
+            .isInstanceOf(NegocioException.class);
+    }
 }

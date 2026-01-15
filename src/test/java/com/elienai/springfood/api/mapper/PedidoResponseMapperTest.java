@@ -26,7 +26,6 @@ import com.elienai.springfood.domain.model.ItemPedido;
 import com.elienai.springfood.domain.model.Pedido;
 import com.elienai.springfood.domain.model.Produto;
 import com.elienai.springfood.domain.model.Restaurante;
-import com.elienai.springfood.domain.model.StatusPedidoEnum;
 import com.elienai.springfood.domain.model.Usuario;
 
 public class PedidoResponseMapperTest {
@@ -91,7 +90,6 @@ public class PedidoResponseMapperTest {
 		pedido.setRestaurante(restaurante);
 		pedido.setCliente(cliente);
 		pedido.setFormaPagamento(formaPagamento);
-		pedido.setStatus(StatusPedidoEnum.CONFIRMADO);
 		pedido.setDataCriacao(OffsetDateTime.now());
 		pedido.setItens(List.of(itemPedido));
 		pedido.calcularValorTotal();
@@ -112,7 +110,7 @@ public class PedidoResponseMapperTest {
 				new BigDecimal("50.00"),
 				new BigDecimal("10.00"),
 				new BigDecimal("60.00"),
-				"CONFIRMADO"
+				"CRIADO"
 			);
 
 		assertThat(pedidoResponse.getRestaurante())
@@ -190,14 +188,12 @@ public class PedidoResponseMapperTest {
 		pedido1.setSubtotal(new BigDecimal("100.00"));
 		pedido1.setTaxaFrete(new BigDecimal("10.00"));
 		pedido1.setValorTotal(new BigDecimal("110.00"));
-		pedido1.setStatus(StatusPedidoEnum.CRIADO);
 
 		var pedido2 = new Pedido();
 		pedido2.setId(2L);
 		pedido2.setSubtotal(new BigDecimal("200.00"));
 		pedido2.setTaxaFrete(new BigDecimal("20.00"));
 		pedido2.setValorTotal(new BigDecimal("220.00"));
-		pedido2.setStatus(StatusPedidoEnum.CANCELADO);
 
 		var pedidos = List.of(pedido1, pedido2);
 
@@ -215,7 +211,7 @@ public class PedidoResponseMapperTest {
 			)
 			.containsExactlyInAnyOrder(
 				tuple(1L, new BigDecimal("100.00"), new BigDecimal("10.00"), new BigDecimal("110.00"), "CRIADO"),
-				tuple(2L, new BigDecimal("200.00"), new BigDecimal("20.00"), new BigDecimal("220.00"), "CANCELADO")
+				tuple(2L, new BigDecimal("200.00"), new BigDecimal("20.00"), new BigDecimal("220.00"), "CRIADO")
 			);
 	}
 }

@@ -237,7 +237,7 @@ public class PedidoControllerIT {
 	     .then()
 	         .statusCode(HttpStatus.BAD_REQUEST.value())
 	         .body("status", is(400))
-	         .body("title", is("Dados inválidos"))
+	         .body("title", is("aDados inválidos"))
 	         .body("detail", containsString("Um ou mais campos estão inválidos"))
 	
 	         .body("objects.name", hasItems(

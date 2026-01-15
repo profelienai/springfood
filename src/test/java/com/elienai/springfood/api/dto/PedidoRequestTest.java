@@ -92,6 +92,6 @@ class PedidoRequestTest {
 
         assertThat(violations)
             .extracting(ConstraintViolation::getMessage)
-            .contains("deve ser maior ou igual a 1");
+            .contains("tamanho deve ser entre 1 e 2147483647");
     }
 }

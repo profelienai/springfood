@@ -1,13 +1,22 @@
 package com.elienai.springfood.domain.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.elienai.springfood.domain.exception.NegocioException;
+
 class PedidoTest {
+
+    // =====================================================
+    // STATUS INICIAL
+    // =====================================================
+
     @Test
     void deveIniciarComStatusCriado() {
         Pedido pedido = new Pedido();
@@ -15,6 +24,10 @@ class PedidoTest {
         assertThat(pedido.getStatus())
             .isEqualTo(StatusPedidoEnum.CRIADO);
     }
+
+    // =====================================================
+    // CÁLCULO DE VALORES
+    // =====================================================
 
     @Test
     void deveCalcularSubtotalEValorTotal_quandoItensExistirem() {
@@ -71,12 +84,94 @@ class PedidoTest {
             .isEqualByComparingTo("20.00");
     }
 
-    private ItemPedido criarItem(BigDecimal precoUnitario, Integer quantidade) {
-        ItemPedido item = new ItemPedido();
-        item.setPrecoUnitario(precoUnitario);
-        item.setQuantidade(quantidade);
-        return item;
+    // =====================================================
+    // TRANSIÇÕES DE STATUS – CENÁRIOS VÁLIDOS
+    // =====================================================
+
+    @Test
+    void deveConfirmarPedido_quandoStatusForCriado() {
+        Pedido pedido = new Pedido();
+
+        pedido.confirmar();
+
+        assertThat(pedido.getStatus())
+            .isEqualTo(StatusPedidoEnum.CONFIRMADO);
+
+        assertThat(pedido.getDataConfirmacao())
+            .isNotNull()
+            .isBeforeOrEqualTo(OffsetDateTime.now());
     }
+
+    @Test
+    void deveEntregarPedido_quandoStatusForConfirmado() {
+        Pedido pedido = new Pedido();
+        pedido.confirmar();
+
+        pedido.entregar();
+
+        assertThat(pedido.getStatus())
+            .isEqualTo(StatusPedidoEnum.ENTREGUE);
+
+        assertThat(pedido.getDataEntrega())
+            .isNotNull()
+            .isBeforeOrEqualTo(OffsetDateTime.now());
+    }
+
+    @Test
+    void deveCancelarPedido_quandoStatusForCriado() {
+        Pedido pedido = new Pedido();
+
+        pedido.cancelar();
+
+        assertThat(pedido.getStatus())
+            .isEqualTo(StatusPedidoEnum.CANCELADO);
+
+        assertThat(pedido.getDataCancelamento())
+            .isNotNull()
+            .isBeforeOrEqualTo(OffsetDateTime.now());
+    }
+
+    // =====================================================
+    // TRANSIÇÕES DE STATUS – CENÁRIOS INVÁLIDOS
+    // =====================================================
+
+    @Test
+    void naoDevePermitirConfirmarPedido_queJaFoiConfirmado() {
+        Pedido pedido = new Pedido();
+        pedido.setId(1L);
+        pedido.confirmar();
+
+        assertThatThrownBy(pedido::confirmar)
+            .isInstanceOf(NegocioException.class)
+            .hasMessage("Status do pedido 1 não pode ser alterado de Confirmado para Confirmado");
+    }
+
+    @Test
+    void naoDevePermitirEntregarPedido_queNaoEstejaConfirmado() {
+        Pedido pedido = new Pedido();
+        pedido.setId(1L);
+
+        assertThatThrownBy(pedido::entregar)
+            .isInstanceOf(NegocioException.class)
+            .hasMessage("Status do pedido 1 não pode ser alterado de Criado para Entregue");
+    }
+
+    @Test
+    void naoDevePermitirCancelarPedido_queJaFoiEntregue() {
+        Pedido pedido = new Pedido();
+        pedido.setId(1L);
+        
+        pedido.confirmar();
+        pedido.entregar();
+
+        assertThatThrownBy(pedido::cancelar)
+            .isInstanceOf(NegocioException.class)
+            .hasMessage("Status do pedido 1 não pode ser alterado de Entregue para Cancelado");
+    }
+
+    // =====================================================
+    // EQUALS & HASHCODE
+    // =====================================================
 
     @Test
     void deveSerIgual_quandoIdsForemIguais() {
@@ -99,5 +194,16 @@ class PedidoTest {
         p2.setId(2L);
 
         assertThat(p1).isNotEqualTo(p2);
+    }
+
+    // =====================================================
+    // MÉTODO AUXILIAR
+    // =====================================================
+
+    private ItemPedido criarItem(BigDecimal precoUnitario, Integer quantidade) {
+        ItemPedido item = new ItemPedido();
+        item.setPrecoUnitario(precoUnitario);
+        item.setQuantidade(quantidade);
+        return item;
     }
 }
