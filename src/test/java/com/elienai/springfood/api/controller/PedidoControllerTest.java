@@ -91,7 +91,7 @@ public class PedidoControllerTest {
 				.andExpect(jsonPath("$", hasSize(2)))
 
 				// Pedido 1
-				.andExpect(jsonPath("$[0].id").value(1))
+				.andExpect(jsonPath("$[0].codigo").value("ABC123"))
 				.andExpect(jsonPath("$[0].subtotal").value(100.00))
 				.andExpect(jsonPath("$[0].taxaFrete").value(10.00))
 				.andExpect(jsonPath("$[0].valorTotal").value(110.00))
@@ -104,7 +104,7 @@ public class PedidoControllerTest {
 				.andExpect(jsonPath("$[0].restaurante.nome").value("Restaurante A"))
 
 				// Pedido 2
-				.andExpect(jsonPath("$[1].id").value(2))
+				.andExpect(jsonPath("$[1].codigo").value("ABC234"))
 				.andExpect(jsonPath("$[1].subtotal").value(200.00))
 				.andExpect(jsonPath("$[1].taxaFrete").value(20.00))
 				.andExpect(jsonPath("$[1].valorTotal").value(220.00))
@@ -119,16 +119,16 @@ public class PedidoControllerTest {
 	}
 	
 	@Test
-	public void deveBuscarPedidoPorId() throws Exception {
-		when(emissaoPedido.buscarOuFalhar(1L)).thenReturn(pedido1);
+	public void deveBuscarPedidoPorCodigo() throws Exception {
+		when(emissaoPedido.buscarOuFalhar("ABC123")).thenReturn(pedido1);
 		when(pedidoResponseMapper.toResponse(pedido1)).thenReturn(pedidoResponse1);
 		
-		mockMvc.perform(get("/pedidos/{id}", 1L)
+		mockMvc.perform(get("/pedidos/{codigoPedido}", "ABC123")
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 
 			// Dados principais
-			.andExpect(jsonPath("$.id").value(1))
+			.andExpect(jsonPath("$.codigo").value("ABC123"))
 			.andExpect(jsonPath("$.subtotal").value(60.00))
 			.andExpect(jsonPath("$.taxaFrete").value(10.00))
 			.andExpect(jsonPath("$.valorTotal").value(70.00))
@@ -183,7 +183,7 @@ public class PedidoControllerTest {
 	        .andExpect(status().isCreated())
 
 	        // Dados principais
-	        .andExpect(jsonPath("$.id", is(1)))
+	        .andExpect(jsonPath("$.codigo", is("ABC123")))
 	        .andExpect(jsonPath("$.status", is("Criado")))
 	        .andExpect(jsonPath("$.valorTotal", is(70.00)))
 
@@ -229,7 +229,7 @@ public class PedidoControllerTest {
 		restaurante2.setNome("Restaurante B");
 
 		pedidoResumoResponse1 = new PedidoResumoResponse();
-		pedidoResumoResponse1.setId(1L);
+		pedidoResumoResponse1.setCodigo("ABC123");
 		pedidoResumoResponse1.setSubtotal(new BigDecimal("100.00"));
 		pedidoResumoResponse1.setTaxaFrete(new BigDecimal("10.00"));
 		pedidoResumoResponse1.setValorTotal(new BigDecimal("110.00"));
@@ -239,7 +239,7 @@ public class PedidoControllerTest {
 		pedidoResumoResponse1.setRestaurante(restaurante1);
 
 		pedidoResumoResponse2 = new PedidoResumoResponse();
-		pedidoResumoResponse2.setId(2L);
+		pedidoResumoResponse2.setCodigo("ABC234");
 		pedidoResumoResponse2.setSubtotal(new BigDecimal("200.00"));
 		pedidoResumoResponse2.setTaxaFrete(new BigDecimal("20.00"));
 		pedidoResumoResponse2.setValorTotal(new BigDecimal("220.00"));
@@ -270,7 +270,7 @@ public class PedidoControllerTest {
 		item.setObservacao("Sem cebola");
 
 		pedidoResponse1 = new PedidoResponse();
-		pedidoResponse1.setId(1L);
+		pedidoResponse1.setCodigo("ABC123");
 		pedidoResponse1.setSubtotal(new BigDecimal("60.00"));
 		pedidoResponse1.setTaxaFrete(new BigDecimal("10.00"));
 		pedidoResponse1.setValorTotal(new BigDecimal("70.00"));

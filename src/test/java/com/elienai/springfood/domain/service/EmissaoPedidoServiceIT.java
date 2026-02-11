@@ -47,7 +47,7 @@ public class EmissaoPedidoServiceIT {
     
 	@Test
 	public void deveRetornarPedidoPorId() {
-		Pedido pedido = emissaoPedido.buscarOuFalhar(1L);
+		Pedido pedido = emissaoPedido.buscarOuFalhar("ABC123");
 		
 		assertNotNull(pedido);
 		assertEquals(1L, pedido.getId());
@@ -55,9 +55,9 @@ public class EmissaoPedidoServiceIT {
 	
 	@Test
 	public void deveLancarExcecaoAoBuscar_QuandoPedidoInexistente() {
-		PedidoNaoEncontradoException ex = assertThrows(PedidoNaoEncontradoException.class, () -> emissaoPedido.buscarOuFalhar(99L));
+		PedidoNaoEncontradoException ex = assertThrows(PedidoNaoEncontradoException.class, () -> emissaoPedido.buscarOuFalhar("AAA999"));
 		
-		assertEquals("Não existe um pedido com código 99", ex.getMessage());
+		assertEquals("Não existe um pedido com código AAA999", ex.getMessage());
 	}
 
 	@Test

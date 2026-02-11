@@ -6,14 +6,8 @@ import org.junit.jupiter.api.Test;
 
 public class PedidoNaoEncontradoExceptionTest {
 	@Test
-	void testPedidoNaoEncontradoException_comMensagem() {
-		PedidoNaoEncontradoException ex = new PedidoNaoEncontradoException("Pedido não encontrado");
-		assertEquals("Pedido não encontrado", ex.getMessage());
-	}
-
-	@Test
 	void testPedidoNaoEncontradoException_comPedidoId() {
-		PedidoNaoEncontradoException ex = new PedidoNaoEncontradoException(99L);
-		assertEquals("Não existe um pedido com código 99", ex.getMessage());
+		PedidoNaoEncontradoException ex = new PedidoNaoEncontradoException("ABC123");
+		assertEquals("Não existe um pedido com código ABC123", ex.getMessage());
 	}
 }

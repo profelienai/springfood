@@ -84,14 +84,14 @@ public class PedidoControllerIT {
 	    	.body("", hasSize(2))    
 
 			// Pedido 1
-			.body("[0].id", is(1))
+			.body("[0].codigo", is("ABC123"))
 			.body("[0].status", is("CRIADO"))
 			.body("[0].valorTotal", is(308.90f))
 			.body("[0].restaurante.nome", is("Thai Gourmet"))
 			.body("[0].cliente.nome", is("João da Silva"))
 	
 			// Pedido 2
-			.body("[1].id", is(2))
+			.body("[1].codigo", is("ABC234"))
 			.body("[1].status", is("CRIADO"))
 			.body("[1].valorTotal", is(79f))
 			.body("[1].restaurante.nome", is("Java Steakhouse"))
@@ -101,15 +101,15 @@ public class PedidoControllerIT {
 	@Test
 	public void deveRetornarStatus200_QuandoConsultarPedidoExistente() {
 		given()
-			.pathParam("pedidoId", 1L)
+			.pathParam("codigoPedido", "ABC123")
 			.accept(ContentType.JSON)
 		.when()
-			.get("/{pedidoId}")
+			.get("/{codigoPedido}")
 		.then()
 			.statusCode(HttpStatus.OK.value())
 
 			// Dados principais
-			.body("id", is(1))
+			.body("codigo", is("ABC123"))
 			.body("status", is("CRIADO"))
 			.body("subtotal", is(298.90f))
 			.body("taxaFrete", is(10f))
@@ -170,7 +170,7 @@ public class PedidoControllerIT {
             .statusCode(HttpStatus.CREATED.value())
 
             // ===== Dados principais =====
-            .body("id", is(3))
+            .body("codigo", notNullValue())
             .body("status", is("CRIADO"))
             .body("dataCriacao", notNullValue())
             .body("dataConfirmacao", nullValue())
@@ -237,7 +237,7 @@ public class PedidoControllerIT {
 	     .then()
 	         .statusCode(HttpStatus.BAD_REQUEST.value())
 	         .body("status", is(400))
-	         .body("title", is("aDados inválidos"))
+	         .body("title", is("Dados inválidos"))
 	         .body("detail", containsString("Um ou mais campos estão inválidos"))
 	
 	         .body("objects.name", hasItems(

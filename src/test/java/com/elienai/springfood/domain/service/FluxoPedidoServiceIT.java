@@ -45,10 +45,10 @@ class FluxoPedidoServiceIT {
     
 	@Test
 	void deveConfirmarPedidoComSucesso() {
-		fluxoPedidoService.confirmar(1L);
+		fluxoPedidoService.confirmar("ABC123");
 		
 		// Confirma persistência no banco via Repository
-		Optional<Pedido> optPedido = pedidoRepository.findById(1L);
+		Optional<Pedido> optPedido = pedidoRepository.findByCodigo("ABC123");
 		assertThat(optPedido.isPresent()).isTrue();
 		
 		Pedido pedido = optPedido.get();
@@ -58,19 +58,19 @@ class FluxoPedidoServiceIT {
 
 	@Test
 	void deveFalharAoConfirmarPedidoQueNaoEstaCriado() {
-		fluxoPedidoService.confirmar(1L); // confirma uma vez
+		fluxoPedidoService.confirmar("ABC123"); // confirma uma vez
 
-		assertThatThrownBy(() -> fluxoPedidoService.confirmar(1L))
+		assertThatThrownBy(() -> fluxoPedidoService.confirmar("ABC123"))
 			.isInstanceOf(NegocioException.class)
-			.hasMessageContaining("Status do pedido 1 não pode ser alterado");
+			.hasMessageContaining("Status do pedido ABC123 não pode ser alterado");
 	}
 
 	@Test
 	void deveCancelarPedidoComSucesso() {
-		fluxoPedidoService.cancelar(1L);
+		fluxoPedidoService.cancelar("ABC123");
 
 		// Confirma persistência no banco via Repository
-		Optional<Pedido> optPedido = pedidoRepository.findById(1L);
+		Optional<Pedido> optPedido = pedidoRepository.findByCodigo("ABC123");
 		assertThat(optPedido.isPresent()).isTrue();
 		
 		Pedido pedido = optPedido.get();
@@ -80,20 +80,20 @@ class FluxoPedidoServiceIT {
 
 	@Test
 	void deveFalharAoCancelarPedidoQueNaoEstaCriado() {
-		fluxoPedidoService.confirmar(1L);
+		fluxoPedidoService.confirmar("ABC123");
 
-		assertThatThrownBy(() -> fluxoPedidoService.cancelar(1L))
+		assertThatThrownBy(() -> fluxoPedidoService.cancelar("ABC123"))
 			.isInstanceOf(NegocioException.class)
-			.hasMessageContaining("Status do pedido 1 não pode ser alterado");
+			.hasMessageContaining("Status do pedido ABC123 não pode ser alterado");
 	}
 
 	@Test
 	void deveEntregarPedidoComSucesso() {
-		fluxoPedidoService.confirmar(1L);
-		fluxoPedidoService.entregar(1L);
+		fluxoPedidoService.confirmar("ABC123");
+		fluxoPedidoService.entregar("ABC123");
 
 		// Confirma persistência no banco via Repository
-		Optional<Pedido> optPedido = pedidoRepository.findById(1L);
+		Optional<Pedido> optPedido = pedidoRepository.findByCodigo("ABC123");
 		assertThat(optPedido.isPresent()).isTrue();
 		
 		Pedido pedido = optPedido.get();
@@ -103,8 +103,8 @@ class FluxoPedidoServiceIT {
 
 	@Test
 	void deveFalharAoEntregarPedidoNaoConfirmado() {
-		assertThatThrownBy(() -> fluxoPedidoService.entregar(1L))
+		assertThatThrownBy(() -> fluxoPedidoService.entregar("ABC123"))
 			.isInstanceOf(NegocioException.class)
-			.hasMessageContaining("Status do pedido 1 não pode ser alterado");
+			.hasMessageContaining("Status do pedido ABC123 não pode ser alterado");
 	}
 }

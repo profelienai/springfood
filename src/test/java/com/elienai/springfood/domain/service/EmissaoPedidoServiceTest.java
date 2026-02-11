@@ -67,29 +67,29 @@ public class EmissaoPedidoServiceTest {
 	
 	@Test
 	void testBuscarOuFalhar_ComSucesso() {
-		Long pedidoId = 10L;
+		String codigoPedido = "ABC123";
 		
-		when(pedidoRepository.findById(pedidoId)).thenReturn(Optional.of(pedido));
+		when(pedidoRepository.findByCodigo(codigoPedido)).thenReturn(Optional.of(pedido));
 		
-		Pedido pedidoEncontrado = emissaoPedidoService.buscarOuFalhar(pedidoId);
+		Pedido pedidoEncontrado = emissaoPedidoService.buscarOuFalhar(codigoPedido);
 	
 		assertNotNull(pedidoEncontrado);
 		assertSame(pedido, pedidoEncontrado);
 		
-		verify(pedidoRepository).findById(pedidoId);
+		verify(pedidoRepository).findByCodigo(codigoPedido);
 	}
 	
 	@Test
 	void testBuscarOuFalhar_LancarExcecaoQuandoPedidoNaoExiste() {
-		Long pedidoId = 999L;
+		String codigoPedido = "ABC123";
 		
-		when(pedidoRepository.findById(pedidoId)).thenReturn(Optional.empty());
+		when(pedidoRepository.findByCodigo(codigoPedido)).thenReturn(Optional.empty());
 		
 		EntidadeNaoEncontradaException ex =
-				assertThrows(EntidadeNaoEncontradaException.class, () -> emissaoPedidoService.buscarOuFalhar(pedidoId));
+				assertThrows(EntidadeNaoEncontradaException.class, () -> emissaoPedidoService.buscarOuFalhar(codigoPedido));
 		
-		assertEquals("Não existe um pedido com código 999", ex.getMessage());
-		verify(pedidoRepository).findById(pedidoId);
+		assertEquals("Não existe um pedido com código ABC123", ex.getMessage());
+		verify(pedidoRepository).findByCodigo(codigoPedido);
 	}
 	
 	@Test

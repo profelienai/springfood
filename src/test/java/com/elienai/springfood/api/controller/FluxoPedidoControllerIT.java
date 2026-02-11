@@ -54,19 +54,19 @@ public class FluxoPedidoControllerIT {
 	@Test
 	public void deveRetornarStatus204_QuandoConfirmarPedidoCriado() {
 		given()
-			.pathParam("pedidoId", 1L)
+			.pathParam("codigoPedido", "ABC123")
 			.accept(ContentType.JSON)
 		.when()
-			.put("/{pedidoId}/confirmacao")
+			.put("/{codigoPedido}/confirmacao")
 		.then()
 			.statusCode(HttpStatus.NO_CONTENT.value());
 
 		// valida estado final
 		given()
-			.pathParam("pedidoId", 1L)
+			.pathParam("codigoPedido", "ABC123")
 			.accept(ContentType.JSON)
 		.when()
-			.get("/{pedidoId}")
+			.get("/{codigoPedido}")
 		.then()
 			.statusCode(HttpStatus.OK.value())
 			.body("status", is("CONFIRMADO"))
@@ -79,24 +79,24 @@ public class FluxoPedidoControllerIT {
 	public void deveRetornarStatus400_QuandoConfirmarPedidoJaConfirmado() {
 		// confirma uma vez
 		given()
-			.pathParam("pedidoId", 1L)
+			.pathParam("codigoPedido", "ABC123")
 		.when()
-			.put("/{pedidoId}/confirmacao")
+			.put("/{codigoPedido}/confirmacao")
 		.then()
 			.statusCode(HttpStatus.NO_CONTENT.value());
 
 		// tenta confirmar novamente
 		given()
-			.pathParam("pedidoId", 1L)
+			.pathParam("codigoPedido", "ABC123")
 			.accept(ContentType.JSON)
 		.when()
-			.put("/{pedidoId}/confirmacao")
+			.put("/{codigoPedido}/confirmacao")
 		.then()
 			.statusCode(HttpStatus.BAD_REQUEST.value())
 	        .body("status", is(HttpStatus.BAD_REQUEST.value()))
 	        .body("title", is("Violação de regra de negócio"))
-	        .body("detail", is("Status do pedido 1 não pode ser alterado de Confirmado para Confirmado"))
-	        .body("userMessage", is("Status do pedido 1 não pode ser alterado de Confirmado para Confirmado"));			
+	        .body("detail", is("Status do pedido ABC123 não pode ser alterado de Confirmado para Confirmado"))
+	        .body("userMessage", is("Status do pedido ABC123 não pode ser alterado de Confirmado para Confirmado"));			
 	}
 
 	// =====================================================
@@ -106,18 +106,18 @@ public class FluxoPedidoControllerIT {
 	@Test
 	public void deveRetornarStatus204_QuandoCancelarPedidoCriado() {
 		given()
-			.pathParam("pedidoId", 2L)
+			.pathParam("codigoPedido", "ABC234")
 			.accept(ContentType.JSON)
 		.when()
-			.put("/{pedidoId}/cancelamento")
+			.put("/{codigoPedido}/cancelamento")
 		.then()
 			.statusCode(HttpStatus.NO_CONTENT.value());
 
 		given()
-			.pathParam("pedidoId", 2L)
+			.pathParam("codigoPedido", "ABC234")
 			.accept(ContentType.JSON)
 		.when()
-			.get("/{pedidoId}")
+			.get("/{codigoPedido}")
 		.then()
 			.statusCode(HttpStatus.OK.value())
 			.body("status", is("CANCELADO"))
@@ -130,24 +130,24 @@ public class FluxoPedidoControllerIT {
 	public void deveRetornarStatus400_QuandoCancelarPedidoJaConfirmado() {
 		// confirma primeiro
 		given()
-			.pathParam("pedidoId", 1L)
+			.pathParam("codigoPedido", "ABC123")
 		.when()
-			.put("/{pedidoId}/confirmacao")
+			.put("/{codigoPedido}/confirmacao")
 		.then()
 			.statusCode(HttpStatus.NO_CONTENT.value());
 
 		// tenta cancelar
 		given()
-			.pathParam("pedidoId", 1L)
+			.pathParam("codigoPedido", "ABC123")
 			.accept(ContentType.JSON)
 		.when()
-			.put("/{pedidoId}/cancelamento")
+			.put("/{codigoPedido}/cancelamento")
 		.then()
 			.statusCode(HttpStatus.BAD_REQUEST.value())
 	        .body("status", is(HttpStatus.BAD_REQUEST.value()))
 	        .body("title", is("Violação de regra de negócio"))
-	        .body("detail", is("Status do pedido 1 não pode ser alterado de Confirmado para Cancelado"))
-	        .body("userMessage", is("Status do pedido 1 não pode ser alterado de Confirmado para Cancelado"));
+	        .body("detail", is("Status do pedido ABC123 não pode ser alterado de Confirmado para Cancelado"))
+	        .body("userMessage", is("Status do pedido ABC123 não pode ser alterado de Confirmado para Cancelado"));
 	}
 
 	// =====================================================
@@ -158,26 +158,26 @@ public class FluxoPedidoControllerIT {
 	public void deveRetornarStatus204_QuandoEntregarPedidoConfirmado() {
 		// confirma primeiro
 		given()
-			.pathParam("pedidoId", 1L)
+			.pathParam("codigoPedido", "ABC123")
 		.when()
-			.put("/{pedidoId}/confirmacao")
+			.put("/{codigoPedido}/confirmacao")
 		.then()
 			.statusCode(HttpStatus.NO_CONTENT.value());
 
 		// entrega
 		given()
-			.pathParam("pedidoId", 1L)
+			.pathParam("codigoPedido", "ABC123")
 			.accept(ContentType.JSON)
 		.when()
-			.put("/{pedidoId}/entrega")
+			.put("/{codigoPedido}/entrega")
 		.then()
 			.statusCode(HttpStatus.NO_CONTENT.value());
 
 		given()
-			.pathParam("pedidoId", 1L)
+			.pathParam("codigoPedido", "ABC123")
 			.accept(ContentType.JSON)
 		.when()
-			.get("/{pedidoId}")
+			.get("/{codigoPedido}")
 		.then()
 			.statusCode(HttpStatus.OK.value())
 			.body("status", is("ENTREGUE"))
@@ -187,15 +187,15 @@ public class FluxoPedidoControllerIT {
 	@Test
 	public void deveRetornarStatus400_QuandoEntregarPedidoCriado() {
 		given()
-			.pathParam("pedidoId", 2L)
+			.pathParam("codigoPedido", "ABC234")
 			.accept(ContentType.JSON)
 		.when()
-			.put("/{pedidoId}/entrega")
+			.put("/{codigoPedido}/entrega")
 		.then()
 			.statusCode(HttpStatus.BAD_REQUEST.value())
 	        .body("status", is(HttpStatus.BAD_REQUEST.value()))
 	        .body("title", is("Violação de regra de negócio"))
-	        .body("detail", is("Status do pedido 2 não pode ser alterado de Criado para Entregue"))
-	        .body("userMessage", is("Status do pedido 2 não pode ser alterado de Criado para Entregue"));			
+	        .body("detail", is("Status do pedido ABC234 não pode ser alterado de Criado para Entregue"))
+	        .body("userMessage", is("Status do pedido ABC234 não pode ser alterado de Criado para Entregue"));			
 	}
 }

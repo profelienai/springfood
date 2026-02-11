@@ -30,20 +30,20 @@ class FluxoPedidoControllerTest {
 
 	@Test
 	void deveRetornarStatus204_QuandoConfirmarPedido() throws Exception {
-		doNothing().when(fluxoPedido).confirmar(1L);
+		doNothing().when(fluxoPedido).confirmar("ABC123");
 
-		mockMvc.perform(put("/pedidos/{pedidoId}/confirmacao", 1L))
+		mockMvc.perform(put("/pedidos/{codigoPedido}/confirmacao", "ABC123"))
 		       .andExpect(status().isNoContent());
 
-		verify(fluxoPedido).confirmar(1L);
+		verify(fluxoPedido).confirmar("ABC123");
 	}
 
 	@Test
 	void deveRetornarStatus400_QuandoConfirmarPedidoComErroDeNegocio() throws Exception {
 		doThrow(new NegocioException("Erro de negócio"))
-			.when(fluxoPedido).confirmar(1L);
+			.when(fluxoPedido).confirmar("ABC123");
 
-		mockMvc.perform(put("/pedidos/{pedidoId}/confirmacao", 1L))
+		mockMvc.perform(put("/pedidos/{codigoPedido}/confirmacao", "ABC123"))
 		       .andExpect(status().isBadRequest());
 	}
 
@@ -53,20 +53,20 @@ class FluxoPedidoControllerTest {
 
 	@Test
 	void deveRetornarStatus204_QuandoCancelarPedido() throws Exception {
-		doNothing().when(fluxoPedido).cancelar(1L);
+		doNothing().when(fluxoPedido).cancelar("ABC123");
 
-		mockMvc.perform(put("/pedidos/{pedidoId}/cancelamento", 1L))
+		mockMvc.perform(put("/pedidos/{codigoPedido}/cancelamento", "ABC123"))
 		       .andExpect(status().isNoContent());
 
-		verify(fluxoPedido).cancelar(1L);
+		verify(fluxoPedido).cancelar("ABC123");
 	}
 
 	@Test
 	void deveRetornarStatus400_QuandoCancelarPedidoComErroDeNegocio() throws Exception {
 		doThrow(new NegocioException("Erro de negócio"))
-			.when(fluxoPedido).cancelar(1L);
+			.when(fluxoPedido).cancelar("ABC123");
 
-		mockMvc.perform(put("/pedidos/{pedidoId}/cancelamento", 1L))
+		mockMvc.perform(put("/pedidos/{codigoPedido}/cancelamento", "ABC123"))
 		       .andExpect(status().isBadRequest());
 	}
 
@@ -76,20 +76,20 @@ class FluxoPedidoControllerTest {
 
 	@Test
 	void deveRetornarStatus204_QuandoEntregarPedido() throws Exception {
-		doNothing().when(fluxoPedido).entregar(1L);
+		doNothing().when(fluxoPedido).entregar("ABC123");
 
-		mockMvc.perform(put("/pedidos/{pedidoId}/entrega", 1L))
+		mockMvc.perform(put("/pedidos/{codigoPedido}/entrega", "ABC123"))
 		       .andExpect(status().isNoContent());
 
-		verify(fluxoPedido).entregar(1L);
+		verify(fluxoPedido).entregar("ABC123");
 	}
 
 	@Test
 	void deveRetornarStatus400_QuandoEntregarPedidoComErroDeNegocio() throws Exception {
 		doThrow(new NegocioException("Erro de negócio"))
-			.when(fluxoPedido).entregar(1L);
+			.when(fluxoPedido).entregar("ABC123");
 
-		mockMvc.perform(put("/pedidos/{pedidoId}/entrega", 1L))
+		mockMvc.perform(put("/pedidos/{codigoPedido}/entrega", "ABC123"))
 		       .andExpect(status().isBadRequest());
 	}
 }

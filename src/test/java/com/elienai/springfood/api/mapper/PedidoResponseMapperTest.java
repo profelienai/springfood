@@ -85,6 +85,7 @@ public class PedidoResponseMapperTest {
 
 		var pedido = new Pedido();
 		pedido.setId(99L);
+		pedido.setCodigo("ABC123");
 		pedido.setTaxaFrete(new BigDecimal("10.00"));
 		pedido.setEnderecoEntrega(endereco);
 		pedido.setRestaurante(restaurante);
@@ -99,14 +100,14 @@ public class PedidoResponseMapperTest {
 		assertThat(pedidoResponse)
 			.isNotNull()
 			.extracting(
-				PedidoResponse::getId,
+				PedidoResponse::getCodigo,
 				PedidoResponse::getSubtotal,
 				PedidoResponse::getTaxaFrete,
 				PedidoResponse::getValorTotal,
 				PedidoResponse::getStatus
 			)
 			.containsExactly(
-				99L,
+				"ABC123",
 				new BigDecimal("50.00"),
 				new BigDecimal("10.00"),
 				new BigDecimal("60.00"),
@@ -185,12 +186,14 @@ public class PedidoResponseMapperTest {
 	void deveConverterCollectionDePedidoParaCollectionDePedidoResponse() {
 		var pedido1 = new Pedido();
 		pedido1.setId(1L);
+		pedido1.setCodigo("ABC123");
 		pedido1.setSubtotal(new BigDecimal("100.00"));
 		pedido1.setTaxaFrete(new BigDecimal("10.00"));
 		pedido1.setValorTotal(new BigDecimal("110.00"));
 
 		var pedido2 = new Pedido();
 		pedido2.setId(2L);
+		pedido2.setCodigo("ABC234");
 		pedido2.setSubtotal(new BigDecimal("200.00"));
 		pedido2.setTaxaFrete(new BigDecimal("20.00"));
 		pedido2.setValorTotal(new BigDecimal("220.00"));
@@ -203,15 +206,15 @@ public class PedidoResponseMapperTest {
 			.isNotNull()
 			.hasSize(2)
 			.extracting(
-				PedidoResponse::getId,
+				PedidoResponse::getCodigo,
 				PedidoResponse::getSubtotal,
 				PedidoResponse::getTaxaFrete,
 				PedidoResponse::getValorTotal,
 				PedidoResponse::getStatus
 			)
 			.containsExactlyInAnyOrder(
-				tuple(1L, new BigDecimal("100.00"), new BigDecimal("10.00"), new BigDecimal("110.00"), "CRIADO"),
-				tuple(2L, new BigDecimal("200.00"), new BigDecimal("20.00"), new BigDecimal("220.00"), "CRIADO")
+				tuple("ABC123", new BigDecimal("100.00"), new BigDecimal("10.00"), new BigDecimal("110.00"), "CRIADO"),
+				tuple("ABC234", new BigDecimal("200.00"), new BigDecimal("20.00"), new BigDecimal("220.00"), "CRIADO")
 			);
 	}
 }

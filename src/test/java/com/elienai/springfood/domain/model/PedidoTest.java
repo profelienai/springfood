@@ -139,34 +139,35 @@ class PedidoTest {
     void naoDevePermitirConfirmarPedido_queJaFoiConfirmado() {
         Pedido pedido = new Pedido();
         pedido.setId(1L);
+        pedido.setCodigo("ABC123");
         pedido.confirmar();
 
         assertThatThrownBy(pedido::confirmar)
             .isInstanceOf(NegocioException.class)
-            .hasMessage("Status do pedido 1 não pode ser alterado de Confirmado para Confirmado");
+            .hasMessage("Status do pedido ABC123 não pode ser alterado de Confirmado para Confirmado");
     }
 
     @Test
     void naoDevePermitirEntregarPedido_queNaoEstejaConfirmado() {
         Pedido pedido = new Pedido();
-        pedido.setId(1L);
+        pedido.setCodigo("ABC123");
 
         assertThatThrownBy(pedido::entregar)
             .isInstanceOf(NegocioException.class)
-            .hasMessage("Status do pedido 1 não pode ser alterado de Criado para Entregue");
+            .hasMessage("Status do pedido ABC123 não pode ser alterado de Criado para Entregue");
     }
 
     @Test
     void naoDevePermitirCancelarPedido_queJaFoiEntregue() {
         Pedido pedido = new Pedido();
-        pedido.setId(1L);
+        pedido.setCodigo("ABC123");
         
         pedido.confirmar();
         pedido.entregar();
 
         assertThatThrownBy(pedido::cancelar)
             .isInstanceOf(NegocioException.class)
-            .hasMessage("Status do pedido 1 não pode ser alterado de Entregue para Cancelado");
+            .hasMessage("Status do pedido ABC123 não pode ser alterado de Entregue para Cancelado");
     }
 
     // =====================================================

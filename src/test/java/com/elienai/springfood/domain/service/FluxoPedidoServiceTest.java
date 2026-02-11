@@ -39,9 +39,9 @@ class FluxoPedidoServiceTest {
 
     @Test
     void deveConfirmarPedido_quandoStatusCriado() {
-        when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
+        when(emissaoPedidoService.buscarOuFalhar("ABC123")).thenReturn(pedido);
 
-        fluxoPedidoService.confirmar(1L);
+        fluxoPedidoService.confirmar("ABC123");
 
         assertThat(pedido.getStatus())
             .isEqualTo(StatusPedidoEnum.CONFIRMADO);
@@ -54,9 +54,9 @@ class FluxoPedidoServiceTest {
     void deveLancarExcecao_quandoConfirmarPedidoJaConfirmado() {
         pedido.confirmar(); // muda estado de forma válida
 
-        when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
+        when(emissaoPedidoService.buscarOuFalhar("ABC123")).thenReturn(pedido);
 
-        assertThatThrownBy(() -> fluxoPedidoService.confirmar(1L))
+        assertThatThrownBy(() -> fluxoPedidoService.confirmar("ABC123"))
             .isInstanceOf(NegocioException.class);
     }
 
@@ -66,9 +66,9 @@ class FluxoPedidoServiceTest {
 
     @Test
     void deveCancelarPedido_quandoStatusCriado() {
-        when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
+        when(emissaoPedidoService.buscarOuFalhar("ABC123")).thenReturn(pedido);
 
-        fluxoPedidoService.cancelar(1L);
+        fluxoPedidoService.cancelar("ABC123");
 
         assertThat(pedido.getStatus())
             .isEqualTo(StatusPedidoEnum.CANCELADO);
@@ -81,9 +81,9 @@ class FluxoPedidoServiceTest {
     void deveLancarExcecao_quandoCancelarPedidoConfirmado() {
         pedido.confirmar();
 
-        when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
+        when(emissaoPedidoService.buscarOuFalhar("ABC123")).thenReturn(pedido);
 
-        assertThatThrownBy(() -> fluxoPedidoService.cancelar(1L))
+        assertThatThrownBy(() -> fluxoPedidoService.cancelar("ABC123"))
             .isInstanceOf(NegocioException.class);
     }
 
@@ -95,9 +95,9 @@ class FluxoPedidoServiceTest {
     void deveEntregarPedido_quandoStatusConfirmado() {
         pedido.confirmar();
 
-        when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
+        when(emissaoPedidoService.buscarOuFalhar("ABC123")).thenReturn(pedido);
 
-        fluxoPedidoService.entregar(1L);
+        fluxoPedidoService.entregar("ABC123");
 
         assertThat(pedido.getStatus())
             .isEqualTo(StatusPedidoEnum.ENTREGUE);
@@ -110,9 +110,9 @@ class FluxoPedidoServiceTest {
     void deveLancarExcecao_quandoEntregarPedidoCriado() {
         // pedido ainda está CRIADO
 
-        when(emissaoPedidoService.buscarOuFalhar(1L)).thenReturn(pedido);
+        when(emissaoPedidoService.buscarOuFalhar("ABC123")).thenReturn(pedido);
 
-        assertThatThrownBy(() -> fluxoPedidoService.entregar(1L))
+        assertThatThrownBy(() -> fluxoPedidoService.entregar("ABC123"))
             .isInstanceOf(NegocioException.class);
     }
 }

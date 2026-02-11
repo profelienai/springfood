@@ -71,10 +71,10 @@ public class PedidoController {
 		}
 	}	
 	
-	@GetMapping("/{pedidoId}")
-	public PedidoResponse buscar(@PathVariable Long pedidoId) {
-		Pedido pedido = emissaoPedido.buscarOuFalhar(pedidoId);
+	@GetMapping("/{codigoPedido}")
+	public PedidoResponse buscar(@PathVariable String codigoPedido) {
+		Pedido pedido = emissaoPedido.buscarOuFalhar(codigoPedido);
 		
 		return pedidoResponseMapper.toResponse(pedido);
-	}
+	}	
 }
